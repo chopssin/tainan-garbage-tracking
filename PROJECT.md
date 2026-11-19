@@ -28,4 +28,4 @@ Vite + React + TypeScript, plain CSS, Leaflet, Vitest, Node 24. Retain the small
 - District/route selection, directed map, stop details, date/time preview, countdowns, and off-day states work on desktop and narrow screens with keyboard access.
 - `npm run check` verifies reproducibility of the data/reports, meaningful tests, types, and production build.
 - The production preview loads at `/tainan-garbage-tracking/`, including JSON and map assets.
-- Local preview is reviewed before deployment. GitHub repository creation/push is deferred under the user's “Finish locally first” instruction. Pages stays opt-in with `PAGES_ENABLED=true`; do not enable or deploy until authorized.
+- Local preview has been reviewed and publication to public `chopssin/tainan-garbage-tracking` is authorized. Pages stays opt-in with `PAGES_ENABLED=true`; do not enable or deploy until separately authorized.

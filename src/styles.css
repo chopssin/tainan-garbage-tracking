@@ -1,0 +1,39 @@
+:root {
+  font-family: system-ui, sans-serif;
+  color: #202e29;
+  background: #f6f7f2;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 280px; }
+main { width: min(100% - 3rem, 48rem); margin: 0 auto; padding: 3rem 0; }
+.brand { display: flex; gap: .65rem; align-items: center; font-weight: 650; }
+.brand span { color: #317650; font-size: 1.75rem; }
+.eyebrow { margin: 5rem 0 1rem; color: #52645a; font-size: .8rem; text-transform: uppercase; letter-spacing: .15em; }
+h1 { max-width: 12ch; margin: 0; font-size: clamp(2.8rem, 8vw, 4.75rem); font-weight: 600; letter-spacing: -.06em; line-height: 1.05; }
+.intro { max-width: 37ch; margin: 1.5rem 0 2.5rem; color: #52645a; font-size: 1.1rem; }
+.demo { padding: 1.75rem; border: 1px solid #d8e0d6; border-radius: 1rem; background: #fff; }
+.demo-heading { display: flex; gap: .75rem; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+h2 { margin: 0; font-size: 1rem; font-weight: 600; }
+.badge { padding: .25rem .6rem; border-radius: 2rem; background: #edf4e9; color: #365b36; font-size: .75rem; }
+.count { display: flex; align-items: baseline; gap: .65rem; margin: 1.5rem 0; color: #52645a; }
+.count strong { font-size: 3rem; line-height: 1; font-weight: 550; color: #202e29; }
+.actions { display: flex; gap: .75rem; flex-wrap: wrap; }
+button { min-height: 44px; padding: .7rem 1rem; border: 1px solid transparent; border-radius: .5rem; font: inherit; font-weight: 550; color: #fff; background: #245e42; cursor: pointer; }
+button:hover { background: #17442e; }
+button span { margin-left: .75rem; }
+button.secondary { color: #3b5145; border-color: #d8e0d6; background: #fff; }
+button.secondary:hover:not(:disabled) { background: #f0f4ed; }
+button:disabled { cursor: default; opacity: .45; }
+button:focus-visible { outline: 3px solid #b15a16; outline-offset: 4px; }
+footer { margin-top: 2rem; color: #52645a; font-size: .85rem; }
+
+@media (max-width: 480px) {
+  main { width: calc(100% - 2rem); padding-top: 1.5rem; }
+  .eyebrow { margin-top: 3.5rem; }
+  .demo { padding: 1.25rem; }
+}

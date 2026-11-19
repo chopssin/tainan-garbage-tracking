@@ -1,0 +1,529 @@
+{
+  "metadata": {
+    "schemaVersion": 1,
+    "title": "臺南市垃圾清運點資料",
+    "publisher": "臺南市政府環境保護局",
+    "catalogUrl": "https://data.tainan.gov.tw/DataSet/Detail/57aaa860-bb03-43c2-a797-73971d6cc73d",
+    "resourceUrl": "https://data.tainan.gov.tw/Resource/84df8cd6-8741-41ed-919c-5105a28ecd6d",
+    "apiUrl": "https://soa.tainan.gov.tw/Api/Service/Get/84df8cd6-8741-41ed-919c-5105a28ecd6d",
+    "license": "政府資料開放授權條款－第1版",
+    "licenseUrl": "https://data.gov.tw/license",
+    "updateFrequency": "不定期更新",
+    "districtReferenceUrl": "https://www.tainan.gov.tw/cp.aspx?n=13293",
+    "catalogMetadataUpdatedAt": "2026-01-28T16:41:37+08:00",
+    "resourceUpdatedAt": "2026-01-02",
+    "catalogObservedAt": "2026-11-19",
+    "retrievedAt": "2026-11-19T05:42:02.314Z",
+    "rawSha256": "6b34a25cf85975ea13a447fa187bb3d11ed6e4d8b93e0ba1a56b49fc11b81e5d",
+    "timezone": "Asia/Taipei",
+    "dayNumberConvention": "JavaScript Sunday=0 through Saturday=6",
+    "dataKind": "published-timetable-not-live-gps",
+    "routeCount": 370,
+    "stopCount": 14190,
+    "districtCount": 36,
+    "expectedDistrictCount": 37,
+    "districts": [
+      "七股區",
+      "下營區",
+      "大內區",
+      "山上區",
+      "中西區",
+      "仁德區",
+      "六甲區",
+      "北門區",
+      "北區",
+      "左鎮區",
+      "永康區",
+      "玉井區",
+      "白河區",
+      "安平區",
+      "安定區",
+      "安南區",
+      "西港區",
+      "佳里區",
+      "官田區",
+      "東山區",
+      "東區",
+      "南化區",
+      "南區",
+      "後壁區",
+      "柳營區",
+      "將軍區",
+      "麻豆區",
+      "善化區",
+      "新化區",
+      "新市區",
+      "新營區",
+      "楠西區",
+      "學甲區",
+      "歸仁區",
+      "關廟區",
+      "鹽水區"
+    ],
+    "missingDistricts": [
+      "龍崎區"
+    ],
+    "exactDuplicateRecords": 0,
+    "issues": {
+      "time-before-previous-stop": 11,
+      "recycling-days-outside-collection-days": 465
+    },
+    "missingInformation": [
+      "No per-record update timestamp, operating date range, holiday/suspension exceptions, or real-time vehicle position is supplied.",
+      "No route names, road geometry, travel duration, departure/dwell times, or cross-midnight service-day indicator is supplied.",
+      "Collection and recycling days are independent source fields; recycling days must not be intersected with garbage collection days.",
+      "Published coordinates are retained as supplied; the resource does not declare its coordinate reference system.",
+      "A successful complete API response establishes dataset coverage, not completeness of every real-world Tainan service."
+    ]
+  },
+  "completeness": {
+    "sourceRecordCount": 14190,
+    "normalizedRecordCount": 14190,
+    "droppedRecords": 0,
+    "apiSuccess": true,
+    "apiErrorCode": 0,
+    "responseBytes": 3476290,
+    "apiSizeField": 4582927,
+    "htmlRecordCount": 14190,
+    "paginationFieldsPresent": false,
+    "notes": "Endpoint returned one complete JSON envelope without pagination fields. Its size field is not a record count or HTTP transfer size."
+  },
+  "fieldPresence": {
+    "AREA": 14190,
+    "ROUTEID": 14190,
+    "ROUTEORDER": 14190,
+    "VILLAGE": 14190,
+    "POINTNAME": 14190,
+    "TIME": 14190,
+    "LONGITUDE": 14190,
+    "LATITUDE": 14190,
+    "WORKDAY": 14190,
+    "RECYCLEDAY": 14190
+  },
+  "unknownFields": [],
+  "districtCoverage": [
+    {
+      "district": "七股區",
+      "routes": 4,
+      "stops": 66
+    },
+    {
+      "district": "下營區",
+      "routes": 10,
+      "stops": 143
+    },
+    {
+      "district": "大內區",
+      "routes": 2,
+      "stops": 57
+    },
+    {
+      "district": "山上區",
+      "routes": 2,
+      "stops": 40
+    },
+    {
+      "district": "中西區",
+      "routes": 16,
+      "stops": 986
+    },
+    {
+      "district": "仁德區",
+      "routes": 13,
+      "stops": 778
+    },
+    {
+      "district": "六甲區",
+      "routes": 4,
+      "stops": 156
+    },
+    {
+      "district": "北門區",
+      "routes": 3,
+      "stops": 56
+    },
+    {
+      "district": "北區",
+      "routes": 19,
+      "stops": 1175
+    },
+    {
+      "district": "左鎮區",
+      "routes": 1,
+      "stops": 41
+    },
+    {
+      "district": "永康區",
+      "routes": 30,
+      "stops": 1785
+    },
+    {
+      "district": "玉井區",
+      "routes": 3,
+      "stops": 46
+    },
+    {
+      "district": "白河區",
+      "routes": 24,
+      "stops": 126
+    },
+    {
+      "district": "安平區",
+      "routes": 8,
+      "stops": 692
+    },
+    {
+      "district": "安定區",
+      "routes": 17,
+      "stops": 640
+    },
+    {
+      "district": "安南區",
+      "routes": 25,
+      "stops": 1608
+    },
+    {
+      "district": "西港區",
+      "routes": 4,
+      "stops": 270
+    },
+    {
+      "district": "佳里區",
+      "routes": 14,
+      "stops": 313
+    },
+    {
+      "district": "官田區",
+      "routes": 4,
+      "stops": 107
+    },
+    {
+      "district": "東山區",
+      "routes": 3,
+      "stops": 160
+    },
+    {
+      "district": "東區",
+      "routes": 25,
+      "stops": 1024
+    },
+    {
+      "district": "南化區",
+      "routes": 1,
+      "stops": 28
+    },
+    {
+      "district": "南區",
+      "routes": 20,
+      "stops": 662
+    },
+    {
+      "district": "後壁區",
+      "routes": 4,
+      "stops": 36
+    },
+    {
+      "district": "柳營區",
+      "routes": 24,
+      "stops": 515
+    },
+    {
+      "district": "將軍區",
+      "routes": 4,
+      "stops": 156
+    },
+    {
+      "district": "麻豆區",
+      "routes": 12,
+      "stops": 273
+    },
+    {
+      "district": "善化區",
+      "routes": 10,
+      "stops": 228
+    },
+    {
+      "district": "新化區",
+      "routes": 13,
+      "stops": 357
+    },
+    {
+      "district": "新市區",
+      "routes": 10,
+      "stops": 367
+    },
+    {
+      "district": "新營區",
+      "routes": 13,
+      "stops": 537
+    },
+    {
+      "district": "楠西區",
+      "routes": 1,
+      "stops": 44
+    },
+    {
+      "district": "學甲區",
+      "routes": 6,
+      "stops": 87
+    },
+    {
+      "district": "歸仁區",
+      "routes": 10,
+      "stops": 298
+    },
+    {
+      "district": "關廟區",
+      "routes": 6,
+      "stops": 179
+    },
+    {
+      "district": "鹽水區",
+      "routes": 5,
+      "stops": 154
+    }
+  ],
+  "exactDuplicateGroups": [],
+  "uniqueCoordinates": 13218,
+  "sourceRouteIdsAcrossDistricts": [],
+  "backwardsTimeTransitions": [
+    {
+      "routeId": "仁德區:319",
+      "previousOrder": 44,
+      "order": 45,
+      "previousTime": "19:31",
+      "time": "18:34"
+    },
+    {
+      "routeId": "六甲區:22",
+      "previousOrder": 36,
+      "order": 37,
+      "previousTime": "18:59",
+      "time": "18:50"
+    },
+    {
+      "routeId": "永康區:47",
+      "previousOrder": 48,
+      "order": 49,
+      "previousTime": "12:12",
+      "time": "10:15"
+    },
+    {
+      "routeId": "永康區:417",
+      "previousOrder": 95,
+      "order": 96,
+      "previousTime": "19:57",
+      "time": "04:59"
+    },
+    {
+      "routeId": "安平區:330",
+      "previousOrder": 36,
+      "order": 37,
+      "previousTime": "15:47",
+      "time": "15:42"
+    },
+    {
+      "routeId": "安平區:332",
+      "previousOrder": 90,
+      "order": 91,
+      "previousTime": "18:52",
+      "time": "15:54"
+    },
+    {
+      "routeId": "安定區:111",
+      "previousOrder": 24,
+      "order": 25,
+      "previousTime": "14:21",
+      "time": "14:18"
+    },
+    {
+      "routeId": "安定區:111",
+      "previousOrder": 29,
+      "order": 30,
+      "previousTime": "15:31",
+      "time": "14:32"
+    },
+    {
+      "routeId": "西港區:139",
+      "previousOrder": 52,
+      "order": 53,
+      "previousTime": "19:32",
+      "time": "19:29"
+    },
+    {
+      "routeId": "南區:209",
+      "previousOrder": 12,
+      "order": 13,
+      "previousTime": "09:19",
+      "time": "09:15"
+    },
+    {
+      "routeId": "新市區:271",
+      "previousOrder": 54,
+      "order": 55,
+      "previousTime": "20:43",
+      "time": "20:40"
+    }
+  ],
+  "duplicateOrders": [],
+  "orderGaps": [],
+  "sameTimeTransitions": [
+    {
+      "routeId": "大內區:15",
+      "previousOrder": 3,
+      "order": 4,
+      "previousTime": "17:31",
+      "time": "17:31"
+    },
+    {
+      "routeId": "大內區:15",
+      "previousOrder": 9,
+      "order": 10,
+      "previousTime": "17:58",
+      "time": "17:58"
+    },
+    {
+      "routeId": "永康區:47",
+      "previousOrder": 39,
+      "order": 40,
+      "previousTime": "11:39",
+      "time": "11:39"
+    },
+    {
+      "routeId": "永康區:47",
+      "previousOrder": 45,
+      "order": 46,
+      "previousTime": "12:03",
+      "time": "12:03"
+    },
+    {
+      "routeId": "永康區:62",
+      "previousOrder": 13,
+      "order": 14,
+      "previousTime": "15:47",
+      "time": "15:47"
+    },
+    {
+      "routeId": "永康區:62",
+      "previousOrder": 17,
+      "order": 18,
+      "previousTime": "15:55",
+      "time": "15:55"
+    },
+    {
+      "routeId": "永康區:64",
+      "previousOrder": 79,
+      "order": 80,
+      "previousTime": "19:13",
+      "time": "19:13"
+    },
+    {
+      "routeId": "永康區:417",
+      "previousOrder": 100,
+      "order": 101,
+      "previousTime": "20:06",
+      "time": "20:06"
+    },
+    {
+      "routeId": "安平區:330",
+      "previousOrder": 98,
+      "order": 99,
+      "previousTime": "20:25",
+      "time": "20:25"
+    },
+    {
+      "routeId": "安平區:333",
+      "previousOrder": 25,
+      "order": 26,
+      "previousTime": "15:12",
+      "time": "15:12"
+    },
+    {
+      "routeId": "安平區:333",
+      "previousOrder": 124,
+      "order": 125,
+      "previousTime": "19:39",
+      "time": "19:39"
+    },
+    {
+      "routeId": "安定區:113",
+      "previousOrder": 43,
+      "order": 44,
+      "previousTime": "14:32",
+      "time": "14:32"
+    },
+    {
+      "routeId": "安定區:114",
+      "previousOrder": 14,
+      "order": 15,
+      "previousTime": "13:38",
+      "time": "13:38"
+    },
+    {
+      "routeId": "安定區:114",
+      "previousOrder": 37,
+      "order": 38,
+      "previousTime": "14:19",
+      "time": "14:19"
+    },
+    {
+      "routeId": "安南區:130",
+      "previousOrder": 42,
+      "order": 43,
+      "previousTime": "18:24",
+      "time": "18:24"
+    },
+    {
+      "routeId": "西港區:139",
+      "previousOrder": 9,
+      "order": 10,
+      "previousTime": "17:59",
+      "time": "17:59"
+    },
+    {
+      "routeId": "西港區:142",
+      "previousOrder": 20,
+      "order": 21,
+      "previousTime": "17:58",
+      "time": "17:58"
+    },
+    {
+      "routeId": "新市區:272",
+      "previousOrder": 1,
+      "order": 2,
+      "previousTime": "17:48",
+      "time": "17:48"
+    },
+    {
+      "routeId": "新市區:272",
+      "previousOrder": 2,
+      "order": 3,
+      "previousTime": "17:48",
+      "time": "17:48"
+    },
+    {
+      "routeId": "新市區:272",
+      "previousOrder": 3,
+      "order": 4,
+      "previousTime": "17:48",
+      "time": "17:48"
+    },
+    {
+      "routeId": "新市區:272",
+      "previousOrder": 9,
+      "order": 10,
+      "previousTime": "17:56",
+      "time": "17:56"
+    },
+    {
+      "routeId": "鹽水區:314",
+      "previousOrder": 20,
+      "order": 21,
+      "previousTime": "19:20",
+      "time": "19:20"
+    }
+  ],
+  "routesWithTimeReversals": 10,
+  "recordsWithIssues": 476,
+  "recordsWithNoRecycling": 1034
+}

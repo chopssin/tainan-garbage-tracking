@@ -64,12 +64,12 @@ OpenStreetMap attribution remains visible. Tiles use the public service without 
 
 ## GitHub and deployment
 
-This local project was seeded from `chopssin/webapp-starter`. Public repository creation as `chopssin/tainan-garbage-tracking` is deferred while local review is completed; no deployment has been performed for this app.
+Public repository: [chopssin/tainan-garbage-tracking](https://github.com/chopssin/tainan-garbage-tracking), created from `chopssin/webapp-starter`. The local app has been reviewed. GitHub Pages deployment remains disabled.
 
-Once GitHub sign-in and publication are authorized, create the public repository from the starter, transfer this local implementation, and push it. GitHub Actions runs checks by default. Deployment additionally requires these one-time repository settings:
+GitHub Actions runs checks on pushes and pull requests. When deployment is separately authorized, complete these one-time repository settings:
 
 1. **Settings → Pages → Source: GitHub Actions**.
 2. **Settings → Secrets and variables → Actions → Variables:** add `PAGES_ENABLED` with value `true` only when ready to publish.
 3. Run the workflow or push to `main`. GitHub supplies the per-repository base path and a short-lived deployment token; no stored personal token or app API key is needed.
 
-Leave `PAGES_ENABLED` unset during local review. The Actions workflow and base-path support are inherited from the starter.
+Leave `PAGES_ENABLED` unset until deployment is authorized. The Actions workflow and base-path support are inherited from the starter.

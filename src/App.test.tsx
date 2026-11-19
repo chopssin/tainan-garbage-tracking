@@ -1,93 +1,113 @@
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import { afterEach, expect, it, vi } from 'vitest'
 import App, { Timetable } from './App'
 import { dataset } from './test/fixtures'
-import type { Route } from './types'
+import type { Location, Visit } from './nearby'
 vi.mock('./RouteMap', () => ({
-  default: ({ route }: { route: Route }) => (
-    <div aria-label="測試地圖">{route.name}</div>
+  default: ({
+    visits,
+    onLocation,
+  }: {
+    visits: Visit[]
+    onLocation: (p: Location) => void
+  }) => (
+    <div aria-label="測試地圖">
+      <span>{visits.length} 個地圖站點</span>
+      <button onClick={() => onLocation({ lat: 23.1, lng: 120.3 })}>
+        指定測試位置
+      </button>
+      <button onClick={() => onLocation({ lat: 25, lng: 121 })}>
+        指定遠方位置
+      </button>
+    </div>
   ),
 }))
-afterEach(() => vi.unstubAllGlobals())
-
-it('changes district and route, previews Taiwan dates/times, and returns to the current clock', async () => {
-  const user = userEvent.setup()
-  render(<Timetable data={dataset} />)
-  expect(screen.getByText('班表估算 · 非即時 GPS')).toBeTruthy()
-  fireEvent.change(screen.getByLabelText('清運日期'), {
+afterEach(() => {
+  vi.unstubAllGlobals()
+  vi.useRealTimers()
+})
+function preview() {
+  fireEvent.change(screen.getByLabelText('日期（台灣時間）'), {
     target: { value: '2026-11-19' },
   })
-  fireEvent.change(screen.getByLabelText('台灣時間'), {
-    target: { value: '17:59:00' },
+  fireEvent.change(screen.getByLabelText('中心時間'), {
+    target: { value: '18:00' },
   })
-  expect(screen.getByText('01:00')).toBeTruthy()
-  await user.selectOptions(screen.getByLabelText('行政區'), '新市區')
-  expect((screen.getByLabelText('清運路線') as HTMLSelectElement).value).toBe(
-    '新市區:266',
-  )
-  expect(screen.getByLabelText('測試地圖').textContent).toBe(
-    '新市區 · 路線 266',
-  )
-  fireEvent.change(screen.getByLabelText('清運日期'), {
-    target: { value: '2026-11-22' },
-  })
-  expect(screen.getByText('今天沒有垃圾收運班次')).toBeTruthy()
-  await user.click(screen.getByRole('button', { name: '回到現在' }))
-  expect(screen.getByText('目前時間')).toBeTruthy()
-})
-
-it('selects a stop with the keyboard and collapses the stop list', async () => {
-  const user = userEvent.setup()
+  fireEvent.click(screen.getByText('指定測試位置'))
+}
+it('searches across routes and hides excluded points from both map and list', () => {
   render(<Timetable data={dataset} />)
-  const stop = screen.getByRole('button', { name: /第 1 站 測試站 1/ })
-  stop.focus()
-  await user.keyboard('{Enter}')
-  expect(stop.getAttribute('aria-pressed')).toBe('true')
-  await user.click(screen.getByRole('button', { name: '收合' }))
+  preview()
+  expect(screen.queryByLabelText('清運路線')).toBeNull()
+  expect(screen.getByText('4 個地圖站點')).toBeTruthy()
   expect(
-    screen.queryByRole('list', { name: '依清運順序排列的站點' }),
-  ).toBeNull()
-  await user.click(screen.getByRole('button', { name: '展開' }))
+    screen.getByRole('list', { name: '符合位置與時間的站點' }).children,
+  ).toHaveLength(4)
+  fireEvent.change(screen.getByLabelText('時間範圍'), {
+    target: { value: '15' },
+  })
+  expect(screen.getByText('3 個地圖站點')).toBeTruthy()
+  fireEvent.click(screen.getByText('指定遠方位置'))
+  expect(screen.getByText('0 個地圖站點')).toBeTruthy()
   expect(
-    screen.getByRole('list', { name: '依清運順序排列的站點' }),
-  ).toBeTruthy()
+    screen.getByRole('list', { name: '符合位置與時間的站點' }).children,
+  ).toHaveLength(0)
 })
-
-it('offers recovery when the dataset fails to load', async () => {
-  const fetchMock = vi
-    .fn()
-    .mockRejectedValueOnce(new Error('Offline'))
-    .mockResolvedValue({ ok: true, json: async () => dataset })
-  vi.stubGlobal('fetch', fetchMock)
-  render(<App />)
-  await userEvent.click(await screen.findByRole('button', { name: '重新載入' }))
-  await waitFor(() => expect(screen.getByLabelText('行政區')).toBeTruthy())
-  expect(fetchMock.mock.calls[0]?.[0]).toBe(
-    `${import.meta.env.BASE_URL}data/tainan-routes.json`,
+it('only requests location on demand and supports denial', () => {
+  const getCurrentPosition = vi.fn((_success, error) => error({ code: 1 }))
+  vi.stubGlobal('navigator', { geolocation: { getCurrentPosition } })
+  render(<Timetable data={dataset} />)
+  expect(getCurrentPosition).not.toHaveBeenCalled()
+  fireEvent.click(screen.getByText('使用我的位置'))
+  expect(screen.getByText('未允許定位。請點選地圖指定位置。')).toBeTruthy()
+  fireEvent.click(screen.getByText('指定測試位置'))
+  expect(screen.queryByText('未允許定位。請點選地圖指定位置。')).toBeNull()
+})
+it('ignores a late location callback after the user chooses a map point', () => {
+  let success: (p: GeolocationPosition) => void = () => {}
+  vi.stubGlobal('navigator', {
+    geolocation: {
+      getCurrentPosition: vi.fn((fn) => {
+        success = fn
+      }),
+    },
+  })
+  render(<Timetable data={dataset} />)
+  preview()
+  fireEvent.click(screen.getByText('使用我的位置'))
+  fireEvent.click(screen.getByText('指定遠方位置'))
+  act(() =>
+    success({
+      coords: { latitude: 23.1, longitude: 120.3, accuracy: 20 },
+    } as GeolocationPosition),
+  )
+  expect(screen.getByText('0 個地圖站點')).toBeTruthy()
+})
+it('returns to the current Taiwan time and restores the one-hour window', () => {
+  vi.useFakeTimers()
+  vi.setSystemTime(new Date('2026-11-19T10:30:00Z'))
+  render(<Timetable data={dataset} />)
+  preview()
+  fireEvent.change(screen.getByLabelText('時間範圍'), {
+    target: { value: '15' },
+  })
+  fireEvent.click(screen.getByText('回到現在 ±1 小時'))
+  expect((screen.getByLabelText('中心時間') as HTMLInputElement).value).toBe(
+    '18:30',
+  )
+  expect((screen.getByLabelText('時間範圍') as HTMLInputElement).value).toBe(
+    '60',
   )
 })
-
-it('pauses the live clock while editing and advances playback without crossing midnight', () => {
-  vi.useFakeTimers()
-  vi.setSystemTime(new Date('2026-11-19T10:00:00Z'))
-  try {
-    render(<Timetable data={dataset} />)
-    const time = screen.getByLabelText('台灣時間') as HTMLInputElement
-    fireEvent.focus(time)
-    expect(screen.getByText('時間預覽')).toBeTruthy()
-    act(() => vi.advanceTimersByTime(2000))
-    expect(time.value).toBe('18:00:00')
-    fireEvent.click(screen.getByRole('button', { name: '播放時間預覽' }))
-    act(() => vi.advanceTimersByTime(1000))
-    expect(time.value).toBe('18:02:00')
-    act(() => vi.advanceTimersByTime(180000))
-    expect(time.value).toBe('23:59:59')
-    expect((screen.getByLabelText('清運日期') as HTMLInputElement).value).toBe(
-      '2026-11-19',
-    )
-    expect(screen.getByRole('button', { name: '播放時間預覽' })).toBeTruthy()
-  } finally {
-    vi.useRealTimers()
-  }
+it('recovers from a failed data request', async () => {
+  vi.stubGlobal(
+    'fetch',
+    vi
+      .fn()
+      .mockRejectedValueOnce(new Error('Offline'))
+      .mockResolvedValue({ ok: true, json: async () => dataset }),
+  )
+  render(<App />)
+  fireEvent.click(await screen.findByText('重新載入'))
+  await waitFor(() => expect(screen.getByText('使用我的位置')).toBeTruthy())
 })

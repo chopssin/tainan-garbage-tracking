@@ -2,7 +2,7 @@
 
 A Traditional Chinese timetable map for Tainan garbage collection. **班表估算 · 非即時 GPS**: it shows published scheduled times, not vehicle locations or arrival confirmation.
 
-Choose a district and route, inspect directed stop connections, view passed/next/upcoming stops, and preview a Taiwan date/time with a countdown and playback. Recycling days are shown separately from garbage collection days.
+Choose your location or click the map, then see nearby scheduled stops across all routes. The default window is now ±1 hour with a 1 km radius; adjust the date, center-time slider, window width, or radius. Stops outside those filters are hidden from both map and list. Location access is requested only when you tap 使用我的位置; it is not stored. The map tile service receives requests for the viewed area. Recycling days are shown separately from garbage collection days.
 
 ## Run locally
 
@@ -54,7 +54,8 @@ The prototype's three routes/78 stops were replaced by the full official snapsho
 
 ## Project layout
 
-- `src/App.tsx`: selection, schedule list, clock/preview, source explanation.
+- `src/App.tsx`: location, radius and time controls, results and source explanation.
+- `src/nearby.ts`: distance/time filtering, cross-date visits and visible-only connections.
 - `src/RouteMap.tsx`: Leaflet map, directed connections, marker selection.
 - `src/schedule.ts`: Taiwan time and timetable states.
 - `scripts/`: deterministic data import and validation.

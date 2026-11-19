@@ -2,16 +2,18 @@
 
 ## Goal
 
-Help people in Tainan choose a garbage collection route and understand its published timetable. Traditional Chinese, one responsive screen, no account or backend.
+Help people in Tainan find nearby scheduled garbage collection stops by location and time, without choosing a route. Traditional Chinese, one responsive screen, no account or backend.
 
 ## Agreed design
 
-- District and route selection using every record in the official Tainan collection-point resource.
-- Numbered stops joined in official order, with direction arrows. Connections are straight lines, not driving directions.
-- Passed, current/next, and upcoming markers, with a countdown to the scheduled time. Inactive and unknown stops remain visible.
-- Taiwan date/time preview, a full-day slider, playback, and return to the current clock.
-- Selecting a stop opens its map location and schedule; the list works when the map tiles cannot load.
-- Always say **班表估算 · 非即時 GPS**. A passed time is not proof that a truck passed. Highlight all stops sharing the next scheduled minute; do not invent a precise vehicle position or dwell time.
+- Location-first search across all official routes; no district or route selector.
+- Use device location only after tapping 使用我的位置, or click/tap the map to select a search center. Provide a map-center search button for keyboard use. No coordinate persistence; third-party map tiles reveal the viewed area to the tile service.
+- Clearly labeled Tainan city-center example before a location is chosen. Default radius 1 km, adjustable to 500 m, 2 km or 5 km.
+- Default time window is Taiwan current time ±1 hour. Date picker, center-time input/slider and adjustable ±15–180 minute window. Return-to-now restores ±1 hour.
+- Hide all out-of-radius, out-of-time, inactive and unknown-coordinate/time/day stops from BOTH map and list. Search independently on each civil date across midnight.
+- Display passed, next visible per-route, and upcoming scheduled stops. Only connect adjacent visible source stops on the same date; never bridge hidden points.
+- Explain empty results and location errors. Map selection supersedes a pending geolocation request.
+- Always say **班表估算 · 非即時 GPS**. Markers are scheduled stops, not running trucks or confirmed arrival positions.
 
 ## Data rules
 
@@ -21,11 +23,15 @@ Current snapshot: 370 routes, 14,190 route-stop records, 36/37 districts; 龍崎
 
 ## Implementation
 
-Vite + React + TypeScript, plain CSS, Leaflet, Vitest, Node 24. Retain the small starter structure and repository-relative asset loading. No API keys, geolocation, analytics, or live GPS integration. Official data is bundled as a static snapshot; map tiles come from OpenStreetMap.
+Vite + React + TypeScript, plain CSS, Leaflet, Vitest, Node 24. Retain the small starter structure and repository-relative asset loading. No API keys, analytics, backend location storage, or vehicle GPS integration. Browser geolocation is optional and user initiated. Official data is bundled as a static snapshot; map tiles come from OpenStreetMap.
 
 ## Acceptance criteria
 
-- District/route selection, directed map, stop details, date/time preview, countdowns, and off-day states work on desktop and narrow screens with keyboard access.
+- Location selection, radius/time filtering, hidden points, midnight/day handling, geolocation fallback and stop details work on desktop and narrow screens with keyboard access.
 - `npm run check` verifies reproducibility of the data/reports, meaningful tests, types, and production build.
 - The production preview loads at `/tainan-garbage-tracking/`, including JSON and map assets.
 - Local preview has been reviewed and GitHub Pages deployment is authorized. Repository `chopssin/tainan-garbage-tracking` uses GitHub Actions with `PAGES_ENABLED=true`; successful pushes to `main` deploy to https://chopssin.github.io/tainan-garbage-tracking/.
+
+## Current iteration
+
+Location-first UX is prepared locally for review. Do not push this iteration until publication is requested; main deploys automatically.

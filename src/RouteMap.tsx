@@ -1,183 +1,174 @@
 import { useEffect, useRef, useState } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
-import type { Route, StopStatus } from './types'
-import { statusLabels } from './schedule'
-
+import { visibleConnections } from './nearby'
+import type { Location, Visit } from './nearby'
 interface Props {
-  route: Route
-  states: StopStatus[]
+  center: Location
+  radius: number
+  visits: Visit[]
   selectedId: string | null
   onSelect: (id: string) => void
+  onLocation: (point: Location) => void
 }
 export default function RouteMap({
-  route,
-  states,
+  center,
+  radius,
+  visits,
   selectedId,
   onSelect,
+  onLocation,
 }: Props) {
-  const container = useRef<HTMLDivElement>(null)
-  const map = useRef<L.Map | null>(null)
-  const markers = useRef(new Map<string, L.Marker>())
-  const fit = useRef<() => void>(() => {})
-  const [tileError, setTileError] = useState(false)
-  const stateKey = states.join(',')
+  const container = useRef<HTMLDivElement>(null),
+    map = useRef<L.Map | null>(null)
+  const stopsLayer = useRef<L.LayerGroup | null>(null),
+    areaLayer = useRef<L.LayerGroup | null>(null)
+  const markers = useRef(new Map<string, L.Marker>()),
+    [tileError, setTileError] = useState(false)
   useEffect(() => {
     if (!container.current) return
     const instance = L.map(container.current, {
       zoomControl: false,
       scrollWheelZoom: false,
-      minZoom: 8,
+      minZoom: 7,
       maxZoom: 19,
-    })
+    }).setView([22.99, 120.205], 14)
     map.current = instance
-    instance.setView([23.05, 120.3], 12)
-    setTileError(false)
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors',
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     })
       .on('tileerror', () => setTileError(true))
       .addTo(instance)
-    const arrows: { marker: L.Marker; from: L.LatLng; to: L.LatLng }[] = []
-    const bounds: L.LatLng[] = []
-    route.stops.forEach((stop, index) => {
-      if (stop.lat === null || stop.lng === null) return
-      const position = L.latLng(stop.lat, stop.lng)
-      bounds.push(position)
-      const previous = route.stops[index - 1]
-      // Don't bridge a missing coordinate: that portion of the route is unknown.
-      if (previous?.lat != null && previous.lng != null) {
-        const from = L.latLng(previous.lat, previous.lng)
-        L.polyline([from, position], {
-          color: '#6b8072',
-          weight: 3,
-          opacity: 0.7,
-          interactive: false,
-        }).addTo(instance)
-        if (!from.equals(position)) {
-          const arrow = L.marker(
-            [(from.lat + position.lat) / 2, (from.lng + position.lng) / 2],
-            {
-              interactive: false,
-              keyboard: false,
-              zIndexOffset: -100,
-              icon: L.divIcon({
-                className: 'route-arrow',
-                html: '<span aria-hidden="true">➤</span>',
-                iconSize: [18, 18],
-                iconAnchor: [9, 9],
-              }),
-            },
-          ).addTo(instance)
-          arrows.push({ marker: arrow, from, to: position })
-        }
-      }
-      const marker = L.marker(position, {
-        keyboard: true,
-        riseOnHover: true,
-        title: `第 ${stop.order ?? index + 1} 站 ${stop.name}`,
-      })
-      const popup = document.createElement('div'),
-        title = document.createElement('strong'),
-        description = document.createElement('p')
-      title.textContent = stop.name
-      description.textContent = `表定 ${stop.time ?? '未知'} · ${stop.village}\n垃圾：週${stop.rawDays}\n回收：${stop.rawRecyclingDays}\n時刻表推估，非實際到站確認。`
-      popup.append(title, description)
-      marker
-        .bindPopup(popup, { maxWidth: 260 })
-        .on('click', () => onSelect(stop.id))
-        .addTo(instance)
-      markers.current.set(stop.id, marker)
-    })
-    const orient = () =>
-      arrows.forEach(({ marker, from, to }) => {
-        const a = instance.latLngToLayerPoint(from),
-          b = instance.latLngToLayerPoint(to)
-        const span = marker.getElement()
-          ?.firstElementChild as HTMLElement | null
-        if (span)
-          span.style.transform = `rotate(${(Math.atan2(b.y - a.y, b.x - a.x) * 180) / Math.PI}deg)`
-      })
-    instance.on('zoomend', orient)
-    fit.current = () => {
-      if (bounds.length)
-        instance.fitBounds(L.latLngBounds(bounds), {
-          padding: [42, 65],
-          maxZoom: 15,
-          animate: false,
-        })
-      orient()
-    }
-    fit.current()
-    const observer = new ResizeObserver(() => {
-      instance.invalidateSize()
-      orient()
-    })
+    stopsLayer.current = L.layerGroup().addTo(instance)
+    areaLayer.current = L.layerGroup().addTo(instance)
+    instance.on('click', (e: L.LeafletMouseEvent) =>
+      onLocation({ lat: e.latlng.lat, lng: e.latlng.lng }),
+    )
+    const observer = new ResizeObserver(() => instance.invalidateSize())
     observer.observe(container.current)
     return () => {
       observer.disconnect()
       instance.remove()
       map.current = null
-      markers.current.clear()
     }
-  }, [route, onSelect])
+  }, [onLocation])
   useEffect(() => {
-    const statuses = stateKey.split(',') as StopStatus[]
-    route.stops.forEach((stop, index) => {
-      const marker = markers.current.get(stop.id),
-        state = statuses[index]!
-      if (!marker) return
-      const number = document.createElement('span')
-      number.className = `marker-dot ${state} ${selectedId === stop.id ? 'selected' : ''}`
-      number.textContent = String(stop.order ?? index + 1)
-      marker.setIcon(
-        L.divIcon({
+    const instance = map.current,
+      layer = areaLayer.current
+    if (!instance || !layer) return
+    layer.clearLayers()
+    const circle = L.circle([center.lat, center.lng], {
+      radius,
+      color: '#496f9a',
+      weight: 2,
+      fillOpacity: 0.04,
+      interactive: false,
+    }).addTo(layer)
+    L.circleMarker([center.lat, center.lng], {
+      radius: 7,
+      color: '#fff',
+      weight: 3,
+      fillColor: '#3269a3',
+      fillOpacity: 1,
+      interactive: false,
+    }).addTo(layer)
+    instance.fitBounds(circle.getBounds(), {
+      padding: [20, 55],
+      animate: false,
+    })
+  }, [center, radius])
+  useEffect(() => {
+    const instance = map.current,
+      layer = stopsLayer.current
+    if (!instance || !layer) return
+    layer.clearLayers()
+    markers.current.clear()
+    for (const [from, to] of visibleConnections(visits)) {
+      const a = L.latLng(from.stop.lat!, from.stop.lng!),
+        b = L.latLng(to.stop.lat!, to.stop.lng!)
+      L.polyline([a, b], {
+        color: '#718570',
+        weight: 2,
+        opacity: 0.65,
+        interactive: false,
+      }).addTo(layer)
+      if (!a.equals(b)) {
+        const p = instance.project(a),
+          q = instance.project(b),
+          angle = (Math.atan2(q.y - p.y, q.x - p.x) * 180) / Math.PI
+        L.marker([(a.lat + b.lat) / 2, (a.lng + b.lng) / 2], {
+          interactive: false,
+          keyboard: false,
+          icon: L.divIcon({
+            className: 'route-arrow',
+            html: `<span style="transform:rotate(${angle}deg)" aria-hidden="true">➤</span>`,
+            iconSize: [18, 18],
+            iconAnchor: [9, 9],
+          }),
+        }).addTo(layer)
+      }
+    }
+    for (const visit of visits) {
+      const dot = document.createElement('span')
+      dot.className = `marker-dot ${visit.state}`
+      dot.textContent = visit.state === 'next' ? visit.route.sourceRouteId : ''
+      const size = visit.state === 'next' ? 32 : 14
+      const marker = L.marker([visit.stop.lat!, visit.stop.lng!], {
+        bubblingMouseEvents: false,
+        title: `${visit.route.district} ${visit.route.sourceRouteId} 號 · ${visit.stop.name} · ${visit.stop.time}`,
+        icon: L.divIcon({
           className: 'stop-marker',
-          html: number,
-          iconSize: [30, 30],
-          iconAnchor: [15, 15],
-          popupAnchor: [0, -16],
+          html: dot,
+          iconSize: [size, size],
+          iconAnchor: [size / 2, size / 2],
         }),
-      )
-      marker.setZIndexOffset(
-        selectedId === stop.id ? 1200 : state === 'next' ? 800 : 0,
-      )
+      })
+      const popup = document.createElement('div')
+      popup.textContent = `${visit.stop.name}\n${visit.date} ${visit.stop.time} · ${visit.route.district} ${visit.route.sourceRouteId} 號\n回收：${visit.stop.rawRecyclingDays}\n班表估算，非實際到站確認。`
+      marker
+        .bindPopup(popup)
+        .on('click', () => onSelect(visit.id))
+        .addTo(layer)
       marker
         .getElement()
         ?.setAttribute(
           'aria-label',
-          `第 ${stop.order ?? index + 1} 站 ${stop.name}，${stop.time ?? '時間未知'}，${statusLabels[state]}`,
+          `${visit.route.district} ${visit.route.sourceRouteId} 號 · ${visit.stop.name} · ${visit.stop.time}`,
         )
-    })
-  }, [route, stateKey, selectedId])
-  useEffect(() => {
-    const marker = selectedId ? markers.current.get(selectedId) : null
-    if (marker && map.current) {
-      map.current.setView(
-        marker.getLatLng(),
-        Math.max(map.current.getZoom(), 15),
-        { animate: false },
-      )
-      marker.openPopup()
+      marker.setZIndexOffset(visit.state === 'next' ? 800 : 0)
+      markers.current.set(visit.id, marker)
     }
-  }, [selectedId, route])
+  }, [visits, onSelect])
+  useEffect(() => {
+    for (const [id, marker] of markers.current)
+      marker
+        .getElement()
+        ?.firstElementChild?.classList.toggle('selected', id === selectedId)
+    const selected = selectedId ? markers.current.get(selectedId) : null
+    if (selected && map.current) {
+      map.current.panTo(selected.getLatLng())
+      selected.openPopup()
+    }
+  }, [selectedId, visits])
   return (
     <div className="map-shell">
-      <div
-        ref={container}
-        className="map"
-        aria-label={`${route.district} ${route.sourceRouteId} 號清運路線地圖`}
-      />
+      <div ref={container} className="map" aria-label="附近清運站點互動地圖" />
       <div className="map-heading">
-        <strong>
-          {route.district} · {route.sourceRouteId} 號路線
-        </strong>
-        <small>依官方清運次序連接站點</small>
+        <strong>點一下地圖，改變搜尋位置</strong>
+        <small>藍點為搜尋中心 · 圓圈內 {radius / 1000} km</small>
       </div>
       <div className="map-controls">
-        <button aria-label="查看完整路線" onClick={() => fit.current()}>
+        <button
+          aria-label="回到搜尋範圍"
+          onClick={() =>
+            map.current?.fitBounds(
+              L.latLng(center.lat, center.lng).toBounds(radius * 2),
+              { padding: [20, 55] },
+            )
+          }
+        >
           ⤢
         </button>
         <button aria-label="放大地圖" onClick={() => map.current?.zoomIn()}>
@@ -186,39 +177,37 @@ export default function RouteMap({
         <button aria-label="縮小地圖" onClick={() => map.current?.zoomOut()}>
           −
         </button>
+        <button
+          aria-label="以地圖中心搜尋"
+          title="以地圖中心搜尋"
+          onClick={() => {
+            const p = map.current?.getCenter()
+            if (p) onLocation({ lat: p.lat, lng: p.lng })
+          }}
+        >
+          ⌖
+        </button>
       </div>
       {tileError && (
-        <div className="tile-notice" role="status">
-          底圖暫時無法完整載入，仍可查看站點與清單。
+        <div className="tile-notice">
+          底圖暫時無法完整載入，仍可使用站點清單。
         </div>
       )}
       <div className="map-key">
-        {states.includes('inactive') && (
-          <span>
-            <i className="inactive" />
-            當日無垃圾
-          </span>
-        )}
-        {states.includes('unknown') && (
-          <span>
-            <i className="unknown" />
-            班表待確認
-          </span>
-        )}
         <span>
           <i className="past" />
           表定已過
         </span>
         <span>
           <i className="next" />
-          當前／下一站
+          各路線下一站
         </span>
         <span>
           <i className="future" />
-          尚未到時
+          稍後班次
         </span>
       </div>
-      <span className="map-note">箭頭表示站點順序，並非行車道路</span>
+      <span className="map-note">僅顯示符合條件站點；連線非行車道路</span>
     </div>
   )
 }

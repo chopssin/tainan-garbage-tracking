@@ -2,7 +2,7 @@ import { render } from '@testing-library/react'
 import { afterEach, expect, it, vi } from 'vitest'
 import L from 'leaflet'
 import RouteMap from './RouteMap'
-import { nearbyVisits, mapVisits } from './nearby'
+import { viewportStops } from './viewport'
 import { dataset } from './test/fixtures'
 
 vi.mock('./vendor/leaflet-maplibre-gl.mjs', () => ({
@@ -19,7 +19,7 @@ afterEach(() => {
   vi.unstubAllGlobals()
 })
 
-it('preserves the viewport when expanding, selecting, collapsing and changing radius', () => {
+it('preserves the viewport when expanding, selecting, collapsing and updating results', () => {
   vi.stubGlobal(
     'ResizeObserver',
     class {
@@ -31,25 +31,31 @@ it('preserves the viewport when expanding, selecting, collapsing and changing ra
   const svg = Object.getOwnPropertyDescriptor(L.Browser, 'svg')!
   Object.defineProperty(L.Browser, 'svg', { ...svg, value: true })
   try {
-    const center = { lat: 23.1, lng: 120.3 }
     const clock = { date: '2026-11-19', seconds: 18 * 3600 }
-    const matches = nearbyVisits(dataset, center, 500, clock, 30)
+    const bounds = {
+      north: 23.102,
+      south: 23.098,
+      east: 120.302,
+      west: 120.298,
+    }
+    const matches = viewportStops(dataset, bounds, clock, null)
     const props = {
-      center,
-      radius: 500,
+      location: null,
+      onLocate: vi.fn(),
+      locating: false,
+      onBounds: vi.fn(),
       visits: matches,
       selectedId: null as string | null,
       expanded: false,
       onCollapse: vi.fn(),
       onSelect: vi.fn(),
-      onLocation: vi.fn(),
     }
     const view = render(<RouteMap {...props} />)
     const fit = vi.spyOn(L.Map.prototype, 'fitBounds')
     const pan = vi.spyOn(L.Map.prototype, 'panTo')
     const setView = vi.spyOn(L.Map.prototype, 'setView')
     const popup = vi.spyOn(L.Marker.prototype, 'bindPopup')
-    const expanded = mapVisits(matches, center, clock, matches[0]!.route.id)
+    const expanded = viewportStops(dataset, bounds, clock, matches[0]!.route.id)
     view.rerender(
       <RouteMap
         {...props}
@@ -61,7 +67,7 @@ it('preserves the viewport when expanding, selecting, collapsing and changing ra
     expect(
       popup.mock.calls.every(([, options]) => options?.autoPan === false),
     ).toBe(true)
-    view.rerender(<RouteMap {...props} radius={1000} />)
+    view.rerender(<RouteMap {...props} />)
     expect(fit).not.toHaveBeenCalled()
     expect(pan).not.toHaveBeenCalled()
     expect(setView).not.toHaveBeenCalled()

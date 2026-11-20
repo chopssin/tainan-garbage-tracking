@@ -7,26 +7,29 @@ import workerUrl from './vendor/maplibre-gl-worker.mjs?worker&url'
 import './vendor/maplibre-gl.css'
 setWorkerUrl(workerUrl)
 import { visibleConnections } from './nearby'
-import type { Location, Visit } from './nearby'
+import type { Location } from './nearby'
+import type { Bounds, MapStop } from './viewport'
 interface Props {
   expanded: boolean
   onCollapse: () => void
-  center: Location
-  radius: number
-  visits: Visit[]
+  location: Location | null
+  onLocate: () => void
+  locating: boolean
+  onBounds: (bounds: Bounds) => void
+  visits: MapStop[]
   selectedId: string | null
   onSelect: (id: string) => void
-  onLocation: (point: Location) => void
 }
 export default function RouteMap({
   expanded,
   onCollapse,
-  center,
-  radius,
+  location,
+  onLocate,
+  locating,
+  onBounds,
   visits,
   selectedId,
   onSelect,
-  onLocation,
 }: Props) {
   const container = useRef<HTMLDivElement>(null),
     map = useRef<L.Map | null>(null)
@@ -38,10 +41,14 @@ export default function RouteMap({
     if (!container.current) return
     const instance = L.map(container.current, {
       zoomControl: false,
-      scrollWheelZoom: false,
+      scrollWheelZoom: true,
+      zoomSnap: 0,
       minZoom: 7,
       maxZoom: 19,
-    }).setView([22.99, 120.205], 14)
+    })
+    instance.fitBounds(L.latLng(22.99, 120.205).toBounds(500), {
+      animate: false,
+    })
     map.current = instance
     try {
       const base = maplibreGL({
@@ -55,59 +62,51 @@ export default function RouteMap({
     }
     stopsLayer.current = L.layerGroup().addTo(instance)
     areaLayer.current = L.layerGroup().addTo(instance)
-    instance.on('click', (e: L.LeafletMouseEvent) =>
-      onLocation({ lat: e.latlng.lat, lng: e.latlng.lng }),
-    )
-    const observer = new ResizeObserver(() =>
-      instance.invalidateSize({ pan: false }),
-    )
+    const reportBounds = () => {
+      const b = instance.getBounds()
+      onBounds({
+        north: b.getNorth(),
+        south: b.getSouth(),
+        east: b.getEast(),
+        west: b.getWest(),
+      })
+    }
+    instance.on('moveend', reportBounds)
+    instance.on('click', onCollapse)
+    reportBounds()
+    const observer = new ResizeObserver(() => {
+      instance.invalidateSize({ pan: false })
+      reportBounds()
+    })
     observer.observe(container.current)
     return () => {
       observer.disconnect()
       instance.remove()
       map.current = null
     }
-  }, [onLocation])
-  const initialArea = useRef(true)
-  const previousCenter = useRef(center)
+  }, [onBounds, onCollapse])
   useEffect(() => {
-    const instance = map.current,
-      layer = areaLayer.current
-    if (!instance || !layer) return
-    layer.clearLayers()
-    const circle = L.circle([center.lat, center.lng], {
-      radius,
-      color: '#496f9a',
-      weight: 2,
-      fillOpacity: 0.04,
-      interactive: false,
-    }).addTo(layer)
-    L.circleMarker([center.lat, center.lng], {
-      radius: 7,
+    if (!location || !map.current || !areaLayer.current) return
+    areaLayer.current.clearLayers()
+    L.circleMarker([location.lat, location.lng], {
+      radius: 6,
       color: '#fff',
-      weight: 3,
+      weight: 2,
       fillColor: '#3269a3',
       fillOpacity: 1,
       interactive: false,
-    }).addTo(layer)
-    if (initialArea.current) {
-      instance.fitBounds(circle.getBounds(), {
-        padding: [20, 55],
-        animate: false,
-      })
-      initialArea.current = false
-    } else if (previousCenter.current !== center) {
-      instance.panTo([center.lat, center.lng], { animate: false })
-    }
-    previousCenter.current = center
-  }, [center, radius])
+    }).addTo(areaLayer.current)
+    map.current.panTo([location.lat, location.lng], { animate: false })
+  }, [location])
   useEffect(() => {
     const instance = map.current,
       layer = stopsLayer.current
     if (!instance || !layer) return
     layer.clearLayers()
     markers.current.clear()
-    for (const [from, to] of visibleConnections(visits)) {
+    for (const [from, to] of visibleConnections(
+      visits.filter((v) => v.connected),
+    )) {
       const a = L.latLng(from.stop.lat!, from.stop.lng!),
         b = L.latLng(to.stop.lat!, to.stop.lng!)
       L.polyline([a, b], {
@@ -135,8 +134,8 @@ export default function RouteMap({
     for (const visit of visits) {
       const dot = document.createElement('span')
       dot.className = `marker-dot ${visit.state}${visit.context ? ' context' : ''}${visit.preview ? ' preview' : ''}`
-      dot.textContent = visit.state === 'next' ? visit.route.sourceRouteId : ''
-      const size = visit.state === 'next' ? 32 : 14
+      dot.textContent = ''
+      const size = 32
       const marker = L.marker([visit.stop.lat!, visit.stop.lng!], {
         bubblingMouseEvents: false,
         autoPanOnFocus: false,
@@ -149,7 +148,13 @@ export default function RouteMap({
         }),
       })
       const popup = document.createElement('div')
-      popup.textContent = `${visit.stop.name}\n${visit.date} ${visit.stop.time} · ${visit.route.district} ${visit.route.sourceRouteId} 號\n垃圾：週${visit.stop.rawDays}\n回收：${visit.stop.rawRecyclingDays}\n${visit.context ? '路線參考站（不符合搜尋條件，請確認收運日）' : '符合搜尋條件'}\n班表估算，非實際到站確認。`
+      popup.textContent = `${visit.stop.name}\n${visit.date} ${visit.stop.time} · ${visit.route.district} ${visit.route.sourceRouteId} 號\n垃圾：週${visit.stop.rawDays}\n回收：${visit.stop.rawRecyclingDays}\n${visit.context ? '參考站點，請確認收運日與時間。' : '表定目前／接續班次'}\n班表估算，非實際到站確認。`
+      const link = document.createElement('a')
+      link.href = `https://www.google.com/maps/search/?api=1&query=${visit.stop.lat},${visit.stop.lng}`
+      link.textContent = '在 Google 地圖開啟'
+      link.target = '_blank'
+      link.rel = 'noopener noreferrer'
+      popup.append(document.createElement('br'), link)
       marker
         .bindPopup(popup, {
           maxWidth: 220,
@@ -180,16 +185,18 @@ export default function RouteMap({
         ?.firstElementChild?.classList.toggle('selected', id === selectedId)
     const selected = selectedId ? markers.current.get(selectedId) : null
     if (selected && map.current) {
+      const point = map.current.latLngToContainerPoint(selected.getLatLng())
+      const size = map.current.getSize()
+      selected.getPopup()!.options.offset = L.point(
+        Math.max(130 - point.x, Math.min(0, size.x - 130 - point.x)),
+        point.y < 200 ? 210 : 0,
+      )
       selected.openPopup()
     }
   }, [selectedId, visits, expanded])
   return (
     <div className="map-shell">
       <div ref={container} className="map" aria-label="附近清運站點互動地圖" />
-      <div className="map-heading">
-        <strong>點一下地圖，改變搜尋位置</strong>
-        <small>藍點為搜尋中心 · 圓圈內 {radius / 1000} km</small>
-      </div>
       <div className="map-controls">
         {expanded && (
           <button
@@ -200,54 +207,27 @@ export default function RouteMap({
             收合
           </button>
         )}
-        <button
-          aria-label="回到搜尋範圍"
-          onClick={() =>
-            map.current?.fitBounds(
-              L.latLng(center.lat, center.lng).toBounds(radius * 2),
-              { padding: [20, 55] },
-            )
-          }
-        >
-          ⤢
-        </button>
         <button aria-label="放大地圖" onClick={() => map.current?.zoomIn()}>
           ＋
         </button>
         <button aria-label="縮小地圖" onClick={() => map.current?.zoomOut()}>
           −
         </button>
-        <button
-          aria-label="以地圖中心搜尋"
-          title="以地圖中心搜尋"
-          onClick={() => {
-            const p = map.current?.getCenter()
-            if (p) onLocation({ lat: p.lat, lng: p.lng })
-          }}
-        >
-          ⌖
-        </button>
       </div>
+      <button
+        className="locate-control"
+        aria-label="使用我的位置"
+        title="使用我的位置"
+        onClick={onLocate}
+        disabled={locating}
+      >
+        {locating ? '…' : '⌖'}
+      </button>
       {tileError && (
         <div className="tile-notice">
           底圖暫時無法完整載入，仍可點選站點查看班表。
         </div>
       )}
-      <div className="map-key">
-        <span>
-          <i className="past" />
-          前一站
-        </span>
-        <span>
-          <i className="next" />
-          目前／下一站
-        </span>
-        <span>
-          <i className="future" />
-          後一站
-        </span>
-      </div>
-      <span className="map-note">前後站為路線參考；連線非行車道路</span>
     </div>
   )
 }

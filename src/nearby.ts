@@ -13,6 +13,7 @@ export interface Visit {
   timestamp: number
   distance: number
   context?: boolean
+  preview?: boolean
   state: 'past' | 'next' | 'future'
 }
 export function distanceMeters(a: Location, b: Location) {
@@ -113,33 +114,53 @@ export function mapVisits(
   clock: Clock,
   expanded: string | null,
 ): Visit[] {
-  const result = new Map(matches.map((v) => [v.id, v]))
+  const result: Visit[] = []
   const now = clockTimestamp(clock)
+  const byRoute = new Map<string, Visit[]>()
   for (const match of matches) {
-    const indices =
-      match.route.id === expanded
-        ? match.route.stops.map((_, index) => index)
-        : [match.index - 1, match.index + 1]
+    const group = byRoute.get(match.route.id) ?? []
+    group.push(match)
+    byRoute.set(match.route.id, group)
+  }
+  for (const group of byRoute.values()) {
+    // Exactly one anchor per route, including tied times and midnight windows.
+    const anchor = [...group].sort(
+      (a, b) => a.timestamp - b.timestamp || a.index - b.index,
+    )[0]!
+    const full = anchor.route.id === expanded
+    const indices = full
+      ? anchor.route.stops.map((_, index) => index)
+      : [anchor.index - 1, anchor.index, anchor.index + 1]
     for (const index of indices) {
-      const stop = match.route.stops[index]
+      const stop = anchor.route.stops[index]
       if (!stop || stop.lat === null || stop.lng === null) continue
-      const id = `${match.date}/${stop.id}`
-      if (result.has(id)) continue
+      const id = `${anchor.date}/${stop.id}`
+      const match = group.find((v) => v.id === id)
       const seconds = timeSeconds(stop.time)
       const timestamp =
-        seconds === null ? NaN : clockTimestamp({ date: match.date, seconds })
-      result.set(id, {
+        seconds === null ? NaN : clockTimestamp({ date: anchor.date, seconds })
+      result.push({
         id,
         stop,
-        route: match.route,
+        route: anchor.route,
         index,
-        date: match.date,
+        date: anchor.date,
         timestamp,
         distance: distanceMeters(center, { lat: stop.lat, lng: stop.lng }),
-        state: timestamp + 60000 <= now ? 'past' : 'future',
-        context: true,
+        state:
+          index === anchor.index
+            ? 'next'
+            : !full
+              ? index < anchor.index
+                ? 'past'
+                : 'future'
+              : timestamp + 60000 <= now
+                ? 'past'
+                : 'future',
+        context: !match,
+        preview: !full,
       })
     }
   }
-  return [...result.values()]
+  return result
 }

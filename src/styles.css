@@ -1146,15 +1146,15 @@ footer p {
 /* Keep legend and map status colors aligned. */
 .map-key i.past,
 .marker-dot.past {
-  background: #748865;
-  border-color: #7c916e;
+  background: #92978f;
+  border-color: #777d75;
 }
 .map-key i.future,
 .marker-dot.future {
   background: #df9e6d;
   border-color: #ce905e;
 }
-.nearby-layout .marker-dot.context {
+.nearby-layout .marker-dot.context:not(.preview) {
   background: #fff;
   border: 2px solid #6b7569;
   opacity: 0.85;

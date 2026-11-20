@@ -134,7 +134,7 @@ export default function RouteMap({
     }
     for (const visit of visits) {
       const dot = document.createElement('span')
-      dot.className = `marker-dot ${visit.state}${visit.context ? ' context' : ''}`
+      dot.className = `marker-dot ${visit.state}${visit.context ? ' context' : ''}${visit.preview ? ' preview' : ''}`
       dot.textContent = visit.state === 'next' ? visit.route.sourceRouteId : ''
       const size = visit.state === 'next' ? 32 : 14
       const marker = L.marker([visit.stop.lat!, visit.stop.lng!], {
@@ -236,18 +236,18 @@ export default function RouteMap({
       <div className="map-key">
         <span>
           <i className="past" />
-          表定已過
+          前一站
         </span>
         <span>
           <i className="next" />
-          各路線下一站
+          目前／下一站
         </span>
         <span>
           <i className="future" />
-          稍後班次
+          後一站
         </span>
       </div>
-      <span className="map-note">空心點為路線參考；連線非行車道路</span>
+      <span className="map-note">前後站為路線參考；連線非行車道路</span>
     </div>
   )
 }

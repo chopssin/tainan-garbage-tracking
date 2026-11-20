@@ -46,7 +46,7 @@ it('defaults to 500m and 30 minutes, removes the list and clears distant results
   preview()
   expect(screen.queryByLabelText('清運路線')).toBeNull()
   expect(screen.queryByText('這段時間的附近站點')).toBeNull()
-  expect(screen.getByText('3 個地圖站點')).toBeTruthy()
+  expect(screen.getByText('2 個地圖站點')).toBeTruthy()
   fireEvent.click(screen.getByText('指定遠方位置'))
   expect(screen.getByText('0 個地圖站點')).toBeTruthy()
 })

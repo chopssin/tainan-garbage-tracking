@@ -151,3 +151,74 @@ it('uses a forward-only window and adds only immediate neighbors until expanded'
   expect(full.map((v) => v.stop.id).sort()).toEqual(['1', '2', '3', '4', '5'])
   expect(mapVisits([], center, clock, route.id)).toEqual([])
 })
+
+it('shows one anchor and its immediate neighbors per unselected route, even with many matching stops', () => {
+  const clock = { date: '2026-11-19', seconds: 18 * 3600 }
+  const stops = [
+    stop('1', '17:50'),
+    stop('2', '18:00'),
+    stop('3', '18:00'),
+    stop('4', '18:10'),
+    stop('5', '18:20'),
+  ]
+  const data = {
+    ...dataset,
+    routes: [
+      { ...route, stops },
+      {
+        ...route,
+        id: 'other',
+        stops: stops.map((s) => ({ ...s, id: 'other-' + s.id })),
+      },
+    ],
+  }
+  const matches = nearbyVisits(data, center, 500, clock, 30)
+  expect(matches).toHaveLength(8)
+  const compact = mapVisits(matches, center, clock, null)
+  expect(compact).toHaveLength(6)
+  expect(compact.filter((v) => v.state === 'next')).toHaveLength(2)
+  expect(
+    compact
+      .filter((v) => v.route.id === route.id)
+      .map((v) => [v.index, v.state]),
+  ).toEqual([
+    [0, 'past'],
+    [1, 'next'],
+    [2, 'future'],
+  ])
+  const expanded = mapVisits(matches, center, clock, route.id)
+  expect(expanded.filter((v) => v.route.id === route.id)).toHaveLength(5)
+  expect(expanded.filter((v) => v.route.id === 'other')).toHaveLength(3)
+  expect(mapVisits(matches, center, clock, null)).toEqual(compact)
+})
+
+it('does not wrap endpoints or skip missing-coordinate neighbors', () => {
+  const clock = { date: '2026-11-19', seconds: 18 * 3600 }
+  const data = {
+    ...dataset,
+    routes: [
+      {
+        ...route,
+        stops: [
+          stop('1', '18:00'),
+          stop('2', '18:05', { lat: null }),
+          stop('3', '18:10'),
+        ],
+      },
+    ],
+  }
+  const matches = nearbyVisits(data, center, 500, clock, 30)
+  expect(mapVisits(matches, center, clock, null).map((v) => v.stop.id)).toEqual(
+    ['1'],
+  )
+  const last = nearbyVisits(
+    data,
+    center,
+    500,
+    { ...clock, seconds: 18 * 3600 + 10 * 60 },
+    30,
+  )
+  expect(mapVisits(last, center, clock, null).map((v) => v.stop.id)).toEqual([
+    '3',
+  ])
+})

@@ -1,5 +1,10 @@
 import { expect, it } from 'vitest'
-import { nearbyVisits, visibleConnections, distanceMeters } from './nearby'
+import {
+  nearbyVisits,
+  mapVisits,
+  visibleConnections,
+  distanceMeters,
+} from './nearby'
 import { dataset, route, stop } from './test/fixtures'
 const center = { lat: 23.1, lng: 120.3 }
 it('filters every route by location, date and inclusive time boundaries', () => {
@@ -58,12 +63,12 @@ it('uses each civil date weekday when a window crosses midnight', () => {
     data,
     center,
     1000,
-    { date: '2026-11-20', seconds: 0 },
+    { date: '2026-11-19', seconds: 23 * 3600 + 30 * 60 },
     60,
   )
   expect(result.map((v) => [v.stop.id, v.date, v.state])).toEqual([
-    ['1', '2026-11-19', 'past'],
-    ['2', '2026-11-20', 'next'],
+    ['1', '2026-11-19', 'next'],
+    ['2', '2026-11-20', 'future'],
   ])
   expect(visibleConnections(result)).toHaveLength(0)
 })
@@ -116,4 +121,33 @@ it('marks the next visible time per route, including simultaneous stops', () => 
   expect(distanceMeters(center, { lat: 23.11, lng: 120.3 })).toBeGreaterThan(
     1000,
   )
+})
+
+it('uses a forward-only window and adds only immediate neighbors until expanded', () => {
+  const clock = { date: '2026-11-19', seconds: 18 * 3600 }
+  const data = {
+    ...dataset,
+    routes: [
+      {
+        ...route,
+        stops: [
+          stop('1', '17:40'),
+          stop('2', '17:50'),
+          stop('3', '18:00'),
+          stop('4', '18:40', { lat: 24 }),
+          stop('5', '19:00'),
+          stop('6', null, { lat: null }),
+        ],
+      },
+    ],
+  }
+  const matches = nearbyVisits(data, center, 500, clock, 30)
+  expect(matches.map((v) => v.stop.id)).toEqual(['3'])
+  const visible = mapVisits(matches, center, clock, null)
+  expect(visible.map((v) => v.stop.id).sort()).toEqual(['2', '3', '4'])
+  expect(visible.filter((v) => v.context)).toHaveLength(2)
+  expect(visibleConnections(visible)).toHaveLength(2)
+  const full = mapVisits(matches, center, clock, route.id)
+  expect(full.map((v) => v.stop.id).sort()).toEqual(['1', '2', '3', '4', '5'])
+  expect(mapVisits([], center, clock, route.id)).toEqual([])
 })

@@ -8,10 +8,11 @@ Help people in Tainan find nearby scheduled garbage collection stops by location
 
 - Location-first search across all official routes; no district or route selector.
 - Use device location only after tapping 使用我的位置, or click/tap the map to select a search center. Provide a map-center search button for keyboard use. No coordinate persistence; third-party map tiles reveal the viewed area to the tile service.
-- Clearly labeled Tainan city-center example before a location is chosen. Default radius 1 km, adjustable to 500 m, 2 km or 5 km.
-- Default time window is Taiwan current time ±1 hour. Date picker, center-time input/slider and adjustable ±15–180 minute window. Return-to-now restores ±1 hour.
-- Hide all out-of-radius, out-of-time, inactive and unknown-coordinate/time/day stops from BOTH map and list. Search independently on each civil date across midnight.
-- Display passed, next visible per-route, and upcoming scheduled stops. Only connect adjacent visible source stops on the same date; never bridge hidden points.
+- Clearly labeled Tainan city-center example before a location is chosen. Default radius 500 m, adjustable to 1 km, 2 km or 5 km.
+- Default time window is Taiwan current time through the next 30 minutes. Date picker, start-time input/slider and adjustable 15–180 minute duration. Return-to-now restores 30 minutes.
+- Show matching stops plus their immediate source-order previous/next stops as hollow context markers. No separate stop list. Tapping a stop reveals its whole route; a collapse button restores the filtered view. Context stops may be outside radius/time or inactive that day, and are explicitly labeled as references. Missing-coordinate stops cannot be mapped. Search independently on each civil date across midnight.
+- Preserve map zoom and position on route expansion, collapse, stop focus and popup opening. After initial framing, only explicit map controls/gestures change zoom; choosing a new search location recenters without changing zoom. Hide temple, church, prayer-room and other religious POI symbols on the base map.
+- Display passed (green), next visible per-route (orange), and upcoming (peach) scheduled stops. Only connect adjacent visible source stops on the same date; never bridge hidden points.
 - Explain empty results and location errors. Map selection supersedes a pending geolocation request.
 - Always say **班表估算 · 非即時 GPS**. Markers are scheduled stops, not running trucks or confirmed arrival positions.
 
@@ -23,7 +24,7 @@ Current snapshot: 370 routes, 14,190 route-stop records, 36/37 districts; 龍崎
 
 ## Implementation
 
-Vite + React + TypeScript, plain CSS, Leaflet, Vitest, Node 24. Retain the small starter structure and repository-relative asset loading. No API keys, analytics, backend location storage, or vehicle GPS integration. Browser geolocation is optional and user initiated. Official data is bundled as a static snapshot; map tiles come from OpenStreetMap.
+Vite + React + TypeScript, plain CSS, Leaflet, Vitest, Node 24. Retain the small starter structure and repository-relative asset loading. No API keys, analytics, backend location storage, or vehicle GPS integration. Browser geolocation is optional and user initiated. Official data is bundled as a static snapshot; the base map uses OpenFreeMap vector tiles (OpenMapTiles/OpenStreetMap) with religious POIs filtered out. Pinned MapLibre browser bundles are in src/vendor with licenses and provenance.
 
 ## Acceptance criteria
 
@@ -34,4 +35,4 @@ Vite + React + TypeScript, plain CSS, Leaflet, Vitest, Node 24. Retain the small
 
 ## Current iteration
 
-Location-first UX is prepared locally for review. Do not push this iteration until publication is requested; main deploys automatically.
+Publication authorized: map-focused UX with 500 m and forward 30-minute defaults, adjacent-stop context, route reveal without viewport changes, and a base map without religious POIs. Main deploys automatically after checks pass.

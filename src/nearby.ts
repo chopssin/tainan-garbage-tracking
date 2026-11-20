@@ -12,6 +12,7 @@ export interface Visit {
   date: string
   timestamp: number
   distance: number
+  context?: boolean
   state: 'past' | 'next' | 'future'
 }
 export function distanceMeters(a: Location, b: Location) {
@@ -38,7 +39,7 @@ export function nearbyVisits(
   minutes: number,
 ): Visit[] {
   const now = clockTimestamp(clock),
-    start = now - minutes * 60000,
+    start = now,
     end = now + minutes * 60000
   const first = taipeiNow(new Date(start)).date,
     last = taipeiNow(new Date(end)).date
@@ -103,4 +104,42 @@ export function visibleConnections(visits: Visit[]) {
     const previous = byKey.get(`${v.route.id}/${v.date}/${v.index - 1}`)
     return previous ? [[previous, v] as const] : []
   })
+}
+
+// Neighbors are source-order context, not additional matching collection visits.
+export function mapVisits(
+  matches: Visit[],
+  center: Location,
+  clock: Clock,
+  expanded: string | null,
+): Visit[] {
+  const result = new Map(matches.map((v) => [v.id, v]))
+  const now = clockTimestamp(clock)
+  for (const match of matches) {
+    const indices =
+      match.route.id === expanded
+        ? match.route.stops.map((_, index) => index)
+        : [match.index - 1, match.index + 1]
+    for (const index of indices) {
+      const stop = match.route.stops[index]
+      if (!stop || stop.lat === null || stop.lng === null) continue
+      const id = `${match.date}/${stop.id}`
+      if (result.has(id)) continue
+      const seconds = timeSeconds(stop.time)
+      const timestamp =
+        seconds === null ? NaN : clockTimestamp({ date: match.date, seconds })
+      result.set(id, {
+        id,
+        stop,
+        route: match.route,
+        index,
+        date: match.date,
+        timestamp,
+        distance: distanceMeters(center, { lat: stop.lat, lng: stop.lng }),
+        state: timestamp + 60000 <= now ? 'past' : 'future',
+        context: true,
+      })
+    }
+  }
+  return [...result.values()]
 }

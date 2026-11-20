@@ -30,28 +30,25 @@ function preview() {
   fireEvent.change(screen.getByLabelText('日期（台灣時間）'), {
     target: { value: '2026-11-19' },
   })
-  fireEvent.change(screen.getByLabelText('中心時間'), {
+  fireEvent.change(screen.getByLabelText('開始時間'), {
     target: { value: '18:00' },
   })
   fireEvent.click(screen.getByText('指定測試位置'))
 }
-it('searches across routes and hides excluded points from both map and list', () => {
+it('defaults to 500m and 30 minutes, removes the list and clears distant results', () => {
   render(<Timetable data={dataset} />)
+  expect((screen.getByLabelText('搜尋半徑') as HTMLSelectElement).value).toBe(
+    '500',
+  )
+  expect((screen.getByLabelText('時間範圍') as HTMLInputElement).value).toBe(
+    '30',
+  )
   preview()
   expect(screen.queryByLabelText('清運路線')).toBeNull()
-  expect(screen.getByText('4 個地圖站點')).toBeTruthy()
-  expect(
-    screen.getByRole('list', { name: '符合位置與時間的站點' }).children,
-  ).toHaveLength(4)
-  fireEvent.change(screen.getByLabelText('時間範圍'), {
-    target: { value: '15' },
-  })
+  expect(screen.queryByText('這段時間的附近站點')).toBeNull()
   expect(screen.getByText('3 個地圖站點')).toBeTruthy()
   fireEvent.click(screen.getByText('指定遠方位置'))
   expect(screen.getByText('0 個地圖站點')).toBeTruthy()
-  expect(
-    screen.getByRole('list', { name: '符合位置與時間的站點' }).children,
-  ).toHaveLength(0)
 })
 it('only requests location on demand and supports denial', () => {
   const getCurrentPosition = vi.fn((_success, error) => error({ code: 1 }))
@@ -83,7 +80,7 @@ it('ignores a late location callback after the user chooses a map point', () => 
   )
   expect(screen.getByText('0 個地圖站點')).toBeTruthy()
 })
-it('returns to the current Taiwan time and restores the one-hour window', () => {
+it('returns to the current Taiwan time and restores the forward 30-minute window', () => {
   vi.useFakeTimers()
   vi.setSystemTime(new Date('2026-11-19T10:30:00Z'))
   render(<Timetable data={dataset} />)
@@ -91,12 +88,12 @@ it('returns to the current Taiwan time and restores the one-hour window', () => 
   fireEvent.change(screen.getByLabelText('時間範圍'), {
     target: { value: '15' },
   })
-  fireEvent.click(screen.getByText('回到現在 ±1 小時'))
-  expect((screen.getByLabelText('中心時間') as HTMLInputElement).value).toBe(
+  fireEvent.click(screen.getByText('回到現在起 30 分鐘'))
+  expect((screen.getByLabelText('開始時間') as HTMLInputElement).value).toBe(
     '18:30',
   )
   expect((screen.getByLabelText('時間範圍') as HTMLInputElement).value).toBe(
-    '60',
+    '30',
   )
 })
 it('recovers from a failed data request', async () => {

@@ -2,7 +2,7 @@
 
 A Traditional Chinese timetable map for Tainan garbage collection. **班表估算 · 非即時 GPS**: it shows published scheduled times, not vehicle locations or arrival confirmation.
 
-Choose your location or click the map, then see nearby scheduled stops across all routes. The default window is now ±1 hour with a 1 km radius; adjust the date, center-time slider, window width, or radius. Stops outside those filters are hidden from both map and list. Location access is requested only when you tap 使用我的位置; it is not stored. The map tile service receives requests for the viewed area. Recycling days are shown separately from garbage collection days.
+Choose your location or click the map, then see nearby scheduled stops across all routes. The default window runs from now through the next 30 minutes with a 500 m radius; adjust the date, start-time slider, duration, or radius. The map shows matching stops and their immediate previous/next stops as hollow reference markers. Tap a stop to reveal its entire route; collapse to return to the filtered view. There is no separate stop list. Location access is requested only when you tap 使用我的位置; it is not stored. The map tile service receives requests for the viewed area. Recycling days are shown separately from garbage collection days.
 
 ## Run locally
 
@@ -13,7 +13,7 @@ npm ci
 npm run dev
 ```
 
-Open the local address printed by Vite. No API key or account is required. The bundled timetable works without an API connection; map tiles require internet access.
+Open the local address printed by Vite. No API key or account is required. The bundled timetable works without an API connection; map tiles require internet access. The OpenFreeMap vector base map hides religious POIs while retaining street labels; expanding a collection route preserves the current map view.
 
 ```sh
 npm run check

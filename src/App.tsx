@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import RouteMap from './RouteMap'
 import { formatTime, taipeiNow, validDate } from './schedule'
-import { clockTimestamp, nearbyVisits, windowLabel } from './nearby'
+import { clockTimestamp, nearbyVisits, mapVisits, windowLabel } from './nearby'
 import type { Location } from './nearby'
 import type { Dataset } from './types'
 
@@ -55,10 +55,10 @@ const minuteNow = () => {
 export function Timetable({ data }: { data: Dataset }) {
   const [center, setCenter] = useState<Location>({ lat: 22.99, lng: 120.205 })
   const [place, setPlace] = useState('台南市中心示範位置'),
-    [radius, setRadius] = useState(1000)
+    [radius, setRadius] = useState(500)
   const [clock, setClock] = useState(minuteNow),
     [live, setLive] = useState(true),
-    [minutes, setMinutes] = useState(60)
+    [minutes, setMinutes] = useState(30)
   const [selected, setSelected] = useState<string | null>(null),
     [locating, setLocating] = useState(false),
     [notice, setNotice] = useState('')
@@ -127,7 +127,29 @@ export function Timetable({ data }: { data: Dataset }) {
   )
   const timestamp = clockTimestamp(clock),
     routeCount = new Set(visits.map((v) => v.route.id)).size
-  const activeSelected = visits.some((v) => v.id === selected) ? selected : null
+  const [expanded, setExpanded] = useState<string | null>(null)
+  useEffect(() => {
+    setExpanded(null)
+    setSelected(null)
+  }, [center, radius, clock, minutes])
+  const visible = useMemo(
+    () => mapVisits(visits, center, clock, expanded),
+    [visits, center, clock, expanded],
+  )
+  const activeSelected = visible.some((v) => v.id === selected)
+    ? selected
+    : null
+  const selectStop = useCallback(
+    (id: string) => {
+      const visit = visible.find((v) => v.id === id)
+      if (visit) {
+        setExpanded(visit.route.id)
+        setSelected(id)
+      }
+    },
+    [visible],
+  )
+
   const affected = new Set(
     visits
       .filter((v) => v.route.issues.includes('time-before-previous-stop'))
@@ -213,10 +235,10 @@ export function Timetable({ data }: { data: Dataset }) {
                   onClick={() => {
                     setLive(true)
                     setClock(minuteNow())
-                    setMinutes(60)
+                    setMinutes(30)
                   }}
                 >
-                  回到現在 ±1 小時
+                  回到現在起 30 分鐘
                 </button>
               </div>
               <div className="nearby-time-inputs">
@@ -235,7 +257,7 @@ export function Timetable({ data }: { data: Dataset }) {
                   />
                 </label>
                 <label>
-                  中心時間
+                  開始時間
                   <input
                     type="time"
                     step="60"
@@ -251,10 +273,10 @@ export function Timetable({ data }: { data: Dataset }) {
                 </label>
               </div>
               <label className="slider-label">
-                拖曳中心時間 · {formatTime(clock.seconds)}
+                拖曳開始時間 · {formatTime(clock.seconds)}
                 <input
                   type="range"
-                  aria-label="中心時間滑桿"
+                  aria-label="開始時間滑桿"
                   min="0"
                   max="1439"
                   value={clock.seconds / 60}
@@ -265,7 +287,7 @@ export function Timetable({ data }: { data: Dataset }) {
                 />
               </label>
               <label className="slider-label">
-                前後各 {minutes} 分鐘
+                接下來 {minutes} 分鐘
                 <input
                   type="range"
                   aria-label="時間範圍"
@@ -277,7 +299,7 @@ export function Timetable({ data }: { data: Dataset }) {
                 />
               </label>
               <p className="window-summary">
-                {windowLabel(timestamp - minutes * 60000)} —{' '}
+                {windowLabel(timestamp)} —{' '}
                 {windowLabel(timestamp + minutes * 60000)}
               </p>
               <p className="coverage-note">跨午夜時，依各日期的收運日篩選。</p>
@@ -287,16 +309,23 @@ export function Timetable({ data }: { data: Dataset }) {
             <RouteMap
               center={center}
               radius={radius}
-              visits={visits}
+              visits={visible}
               selectedId={activeSelected}
-              onSelect={setSelected}
+              onSelect={selectStop}
+              expanded={expanded !== null}
+              onCollapse={() => {
+                setExpanded(null)
+                setSelected(null)
+              }}
               onLocation={chooseLocation}
             />
             <div className="map-summary" role="status">
               {visits.length
                 ? `找到 ${visits.length} 筆站點班表 · ${routeCount} 條路線`
                 : '此範圍與時段沒有符合的垃圾收運站點。'}
-              <p>範圍外、時段外與當日無收運的站點已隱藏。</p>
+              <p>
+                顯示符合條件站點及其前後一站；空心點為路線參考，可能不在範圍或時段內。點站點可展開整條路線。
+              </p>
               {!visits.length && (
                 <p>
                   試著擴大半徑、改變時間，或在地圖選擇其他位置；沒有結果不代表實際無服務。
@@ -311,61 +340,6 @@ export function Timetable({ data }: { data: Dataset }) {
             </div>
           </section>
         </div>
-        <section className="panel nearby-results">
-          <div className="stop-heading">
-            <div>
-              <h2>這段時間的附近站點</h2>
-              <p>依表定時間排序 · 距離為搜尋中心的直線距離</p>
-            </div>
-            <span>{visits.length} 筆</span>
-          </div>
-          <ol className="nearby-list" aria-label="符合位置與時間的站點">
-            {visits.map((v) => (
-              <li
-                key={v.id}
-                className={`${v.state} ${activeSelected === v.id ? 'is-selected' : ''}`}
-              >
-                <button
-                  aria-pressed={activeSelected === v.id}
-                  onClick={() => setSelected(v.id)}
-                >
-                  <span className="stop-number">{v.stop.order}</span>
-                  <span className="stop-main">
-                    <strong>{v.stop.name}</strong>
-                    <small>
-                      {v.route.district} · {v.route.sourceRouteId} 號 ·{' '}
-                      {Math.round(v.distance)} 公尺
-                    </small>
-                  </span>
-                  <span className="visit-time">
-                    <time>
-                      {v.date !== clock.date ? `${v.date.slice(5)} ` : ''}
-                      {v.stop.time}
-                    </time>
-                    <small>
-                      {v.state === 'past'
-                        ? '表定已過'
-                        : v.timestamp <= timestamp
-                          ? '表定現在'
-                          : `距所選時間 ${Math.ceil((v.timestamp - timestamp) / 60000)} 分`}
-                    </small>
-                  </span>
-                </button>
-                {activeSelected === v.id && (
-                  <p className="stop-extra">
-                    垃圾：週{v.stop.rawDays} · 回收：{v.stop.rawRecyclingDays}
-                    。班表估算，非實際到站確認。
-                  </p>
-                )}
-              </li>
-            ))}
-          </ol>
-          {!visits.length && (
-            <p className="empty-results">
-              調整位置或時間後，符合條件的站點會出現在這裡。
-            </p>
-          )}
-        </section>
       </main>
       <footer>
         <p>班表不是車輛即時位置。假日、停駛與臨時異動請以清潔隊公告為準。</p>
@@ -388,7 +362,7 @@ export function Timetable({ data }: { data: Dataset }) {
         </form>
         <h2 id="about-title">看的是班表，不是即時車輛。</h2>
         <p>
-          依搜尋位置、半徑與前後時間篩選官方垃圾收運站點。橘色是各條符合路線在範圍內的當前／下一個表定站點，不代表有車正在現場。連線只連接同日且相鄰的可見站點，不是行車道路。
+          依搜尋位置、半徑與開始時間後的時段篩選官方垃圾收運站點。橘色是各條符合路線在範圍內的當前／下一個表定站點，不代表有車正在現場。空心點為前後站或展開的路線參考，不表示當日有收運。連線只連接相鄰的可見站點，不是行車道路。
         </p>
         <p>
           涵蓋 {data.metadata.districtCount}/

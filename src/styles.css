@@ -308,12 +308,29 @@ h1 {
   line-height: 1.65;
   margin: 12px 16px;
 }
+.stop-popup-time {
+  font-size: 19px;
+  line-height: 1.5;
+  color: #29452a;
+}
 .leaflet-popup-content a {
   display: inline-block;
-  margin-top: 5px;
-  padding: 3px 8px;
-  border: 1px solid #79856d;
-  border-radius: 3px;
+  margin-top: 10px;
+  padding: 9px 12px;
+  border: 1px solid #a3b794;
+  border-radius: 8px;
+  background: #e5eddc;
+  color: #29452a;
+  font-weight: 600;
+  text-decoration: none;
+}
+.leaflet-popup-content a:hover {
+  background: #d5e3c8;
+  border-color: #718961;
+}
+.leaflet-popup-content a:focus-visible {
+  outline: 2px solid #435f34;
+  outline-offset: 3px;
 }
 .leaflet-popup-content-wrapper {
   border-radius: 4px;

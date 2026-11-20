@@ -152,7 +152,15 @@ export default function RouteMap({
         }),
       })
       const popup = document.createElement('div')
-      popup.textContent = `${visit.stop.name}\n${visit.date} ${visit.stop.time} · ${visit.route.district} ${visit.route.sourceRouteId} 號\n垃圾：週${visit.stop.rawDays}\n回收：${visit.stop.rawRecyclingDays}\n${visit.context ? '參考站點，請確認收運日與時間。' : '表定目前／接續班次'}\n班表估算，非實際到站確認。`
+      const time = document.createElement('strong')
+      time.className = 'stop-popup-time'
+      time.textContent = visit.stop.time ?? '時間未提供'
+      popup.append(
+        time,
+        document.createTextNode(
+          `\n${visit.stop.name}\n垃圾：${visit.stop.rawDays}\n回收：${visit.stop.rawRecyclingDays}`,
+        ),
+      )
       const link = document.createElement('a')
       link.href = `https://www.google.com/maps/search/?api=1&query=${visit.stop.lat},${visit.stop.lng}`
       link.textContent = '在 Google 地圖開啟'

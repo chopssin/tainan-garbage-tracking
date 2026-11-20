@@ -11,14 +11,13 @@ it('shows hollow reference stops but connects only each current-to-next pair', (
   expect(result.filter((v) => v.context)).toHaveLength(2)
   expect(visibleConnections(result.filter((v) => v.connected))).toHaveLength(1)
 })
-it('only expands the selected route while other routes stay unconnected references', () => {
+it('hides other routes while selected and restores them on collapse', () => {
   const result = viewportStops(dataset, bounds, clock, route.id)
   expect(result.filter((v) => v.connected)).toHaveLength(3)
-  expect(
-    result
-      .filter((v) => v.route.id !== route.id)
-      .every((v) => !v.connected && v.context),
-  ).toBe(true)
+  expect(result).toHaveLength(3)
+  expect(result.every((v) => v.route.id === route.id)).toBe(true)
+  const restored = viewportStops(dataset, bounds, clock, null)
+  expect(restored.some((v) => v.route.id !== route.id)).toBe(true)
 })
 it('hides background stops above 2 square km while keeping the timetable pair', () => {
   const large = { north: 23.12, south: 23.08, east: 120.32, west: 120.28 }

@@ -19,6 +19,7 @@ interface Props {
   visits: MapStop[]
   selectedId: string | null
   onSelect: (id: string) => void
+  onDismiss: (id: string) => void
 }
 export default function RouteMap({
   expanded,
@@ -30,6 +31,7 @@ export default function RouteMap({
   visits,
   selectedId,
   onSelect,
+  onDismiss,
 }: Props) {
   const container = useRef<HTMLDivElement>(null),
     map = useRef<L.Map | null>(null)
@@ -102,6 +104,8 @@ export default function RouteMap({
     const instance = map.current,
       layer = stopsLayer.current
     if (!instance || !layer) return
+    // Rebuilding layers closes popups internally; only user closes dismiss selection.
+    for (const marker of markers.current.values()) marker.off('popupclose')
     layer.clearLayers()
     markers.current.clear()
     for (const [from, to] of visibleConnections(
@@ -161,6 +165,7 @@ export default function RouteMap({
           autoPan: false,
         })
         .on('click', () => onSelect(visit.id))
+        .on('popupclose', () => onDismiss(visit.id))
         .addTo(layer)
       marker
         .getElement()
@@ -177,7 +182,7 @@ export default function RouteMap({
       marker.setZIndexOffset(visit.state === 'next' ? 800 : 0)
       markers.current.set(visit.id, marker)
     }
-  }, [visits, onSelect])
+  }, [visits, onSelect, onDismiss])
   useEffect(() => {
     for (const [id, marker] of markers.current)
       marker
@@ -187,8 +192,15 @@ export default function RouteMap({
     if (selected && map.current) {
       const point = map.current.latLngToContainerPoint(selected.getLatLng())
       const size = map.current.getSize()
+      // Leave room for the map controls so the close button remains clickable.
+      const popupWidth = Math.min(220, Math.max(140, size.x - 100))
+      const halfWidth = (popupWidth + 32) / 2
+      selected.getPopup()!.options.maxWidth = popupWidth
       selected.getPopup()!.options.offset = L.point(
-        Math.max(130 - point.x, Math.min(0, size.x - 130 - point.x)),
+        Math.max(
+          halfWidth + 10 - point.x,
+          Math.min(0, size.x - halfWidth - 55 - point.x),
+        ),
         point.y < 200 ? 210 : 0,
       )
       selected.openPopup()

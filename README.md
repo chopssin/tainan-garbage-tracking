@@ -2,9 +2,9 @@
 
 A Traditional Chinese timetable map for Tainan garbage collection. **班表估算 · 非即時 GPS**: it shows published scheduled times, not vehicle locations or arrival confirmation.
 
-The square map opens at approximately 500 m × 500 m. Pan or zoom to search the visible area, or tap the location button. Within 2 km², hollow circles show reference stops; orange current/up-next and lighter-orange next stops show the following 30 minutes of published schedules. At wider views, reference circles are hidden. Tap a stop to reveal only its route's connections and view collection/recycling days or open its location in Google Maps.
+The square map opens at approximately 500 m × 500 m. Pan or zoom to search the visible area, or tap the location button. Within 2 km², hollow circles show reference stops; orange current/up-next and lighter-orange next stops show the following 30 minutes of published schedules. At wider views, reference circles are hidden. Tap a stop to reveal only its route (other routes’ stops are hidden) and view collection/recycling days or open its location in Google Maps.
 
-Choose a date (with weekday shown) and drag the time slider, normally 06:00–22:00. 回到現在 returns to actual Taiwan time, including outside those hours. Route reveal preserves the map position and zoom. Location is requested only on demand and never stored; map services receive viewed-area requests.
+Choose a date (with weekday shown) and drag the time slider, normally 06:00–22:00. 回到現在 returns to actual Taiwan time, including outside those hours. Route reveal preserves the map position and zoom. Dismissed stop details stay closed during map navigation; tap a stop to reopen them. Location is requested only on demand and never stored; map services receive viewed-area requests.
 
 ## Run locally
 

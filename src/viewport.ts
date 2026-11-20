@@ -51,6 +51,7 @@ export function viewportStops(
   const all = new Map<string, MapStop>()
   const showReferences = areaKm2(bounds) <= 2
   for (const route of data.routes) {
+    if (selectedRoute && route.id !== selectedRoute) continue
     const records = dates.flatMap((date) =>
       route.stops.flatMap((stop, index): MapStop[] => {
         if (stop.lat === null || stop.lng === null) return []

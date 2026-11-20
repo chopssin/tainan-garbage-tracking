@@ -10,7 +10,7 @@ Help people in Tainan find nearby scheduled garbage collection stops by location
 - Initial map view is approximately 500 m × 500 m. The viewport is the search area; pan/zoom to explore. No radius selector, route selector, sidebar, or stop list.
 - At visible areas ≤2 km² show all geocoded stops as hollow reference markers, including stops without service that day. At larger areas hide these background references.
 - Keep the forward 30-minute timetable window. Each matching route shows one orange current/up-next stop and its immediate source-order next stop in lighter orange, with a directed connection. Missing neighbors are not invented.
-- Tapping any stop reveals that route's full source-order connections; other routes remain unconnected reference stops. Selecting, expanding, and collapsing do not move or zoom the map.
+- Tapping any stop reveals that route's full source-order connections; all stops from other routes are hidden until collapse. Closing a stop popup clears only its detail selection, keeps the route revealed, and remains closed after panning, zooming or time refreshes; tapping a stop opens details again. Selecting, expanding, and collapsing do not move or zoom the map.
 - Stop popup includes name, date/time, route, garbage/recycling days, and a Google Maps link for that public stop's coordinates. Hollow stops do not imply service that day.
 - Date picker shows weekday and month/day; normal time slider spans 06:00–22:00. Return-to-now uses actual Taiwan current time, extending the slider range outside those hours. Default/current time advances automatically.
 - My-location button sits inside the map at bottom right. Permission is user initiated; denial/unavailability falls back to map panning. Ignore late location results after the user moves the map. No coordinate persistence; map services receive viewed-area requests.
@@ -36,4 +36,4 @@ Vite + React + TypeScript, plain CSS, Leaflet, Vitest, Node 24. Retain the small
 
 ## Current iteration
 
-Publication authorized for the sketch-based square-map redesign, viewport search, compact date/time controls, and selected-route details. Main deploys automatically after checks pass.
+Publication authorized: persistent popup dismissal, exclusive selected-route visibility, and the supplied truck icon as favicon and header icon. Main deploys automatically after checks pass.

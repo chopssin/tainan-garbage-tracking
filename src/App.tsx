@@ -100,6 +100,9 @@ export function Timetable({ data }: { data: Dataset }) {
     },
     [stops],
   )
+  const dismiss = useCallback((id: string) => {
+    setSelected((current) => (current === id ? null : current))
+  }, [])
   const collapse = useCallback(() => {
     setSelected(null)
     setSelectedRoute(null)
@@ -139,7 +142,16 @@ export function Timetable({ data }: { data: Dataset }) {
   return (
     <main className="sketch-app">
       <header className="sketch-header">
-        <h1>台南倒垃圾！</h1>
+        <h1>
+          <img
+            className="header-icon"
+            src={`${import.meta.env.BASE_URL}favicon.png`}
+            alt=""
+            width="36"
+            height="36"
+          />
+          台南倒垃圾！
+        </h1>
         <span>班表估算 · 非即時 GPS</span>
       </header>
       <RouteMap
@@ -147,6 +159,7 @@ export function Timetable({ data }: { data: Dataset }) {
         selectedId={selected}
         expanded={!!selectedRoute}
         onSelect={select}
+        onDismiss={dismiss}
         onCollapse={collapse}
         onBounds={changeBounds}
         location={location}

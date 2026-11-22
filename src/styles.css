@@ -402,3 +402,47 @@ h1 {
   object-fit: contain;
   flex-shrink: 0;
 }
+
+.language-switch {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid #a3b794;
+  border-radius: 10px;
+  background: #e5eddc;
+}
+.language-switch button {
+  border: 0;
+  border-radius: 7px;
+  padding: 7px 9px;
+  min-height: 36px;
+  background: transparent;
+  font-size: 13px;
+  color: #53624a;
+}
+.language-switch button[aria-pressed='true'] {
+  background: #38543a;
+  color: #fff;
+  font-weight: 700;
+}
+.language-switch button:hover:not([aria-pressed='true']) {
+  background: #d5e3c8;
+}
+.sketch-header h1 {
+  letter-spacing: 0.04em;
+}
+@media (max-width: 420px) {
+  .sketch-header {
+    flex-wrap: nowrap;
+  }
+  .sketch-header h1 {
+    font-size: 1.15rem;
+    gap: 6px;
+  }
+  .header-icon {
+    width: 30px;
+    height: 30px;
+  }
+}

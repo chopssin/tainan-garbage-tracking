@@ -69,6 +69,21 @@ it('preserves the viewport when expanding, selecting, collapsing and updating re
     expect(
       popup.mock.calls.every(([, options]) => options?.autoPan === false),
     ).toBe(true)
+    view.rerender(
+      <RouteMap
+        {...props}
+        expanded
+        visits={expanded}
+        selectedId={matches[0]!.id}
+        language="en"
+      />,
+    )
+    expect(
+      document.querySelector('.leaflet-popup-content')?.textContent,
+    ).toContain('Garbage')
+    expect(
+      document.querySelector('.leaflet-popup-content')?.textContent,
+    ).toContain('Open in Google Maps')
     view.rerender(<RouteMap {...props} />)
     expect(fit).not.toHaveBeenCalled()
     expect(pan).not.toHaveBeenCalled()

@@ -1,3 +1,4 @@
+import { translator, collectionDays, type Language } from './language'
 import { useEffect, useRef, useState } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -10,6 +11,7 @@ import { visibleConnections } from './nearby'
 import type { Location } from './nearby'
 import type { Bounds, MapStop } from './viewport'
 interface Props {
+  language?: Language
   expanded: boolean
   onCollapse: () => void
   location: Location | null
@@ -22,6 +24,7 @@ interface Props {
   onDismiss: (id: string) => void
 }
 export default function RouteMap({
+  language = 'zh',
   expanded,
   onCollapse,
   location,
@@ -33,6 +36,7 @@ export default function RouteMap({
   onSelect,
   onDismiss,
 }: Props) {
+  const t = translator(language)
   const container = useRef<HTMLDivElement>(null),
     map = useRef<L.Map | null>(null)
   const stopsLayer = useRef<L.LayerGroup | null>(null),
@@ -154,16 +158,16 @@ export default function RouteMap({
       const popup = document.createElement('div')
       const time = document.createElement('strong')
       time.className = 'stop-popup-time'
-      time.textContent = visit.stop.time ?? '時間未提供'
+      time.textContent = visit.stop.time ?? t('時間未提供')
       popup.append(
         time,
         document.createTextNode(
-          `\n${visit.stop.name}\n垃圾：${visit.stop.rawDays}\n回收：${visit.stop.rawRecyclingDays}`,
+          `\n${visit.stop.name}\n${t('垃圾')}：${collectionDays(language, visit.stop.rawDays, visit.stop.collectionDays)}\n${t('回收')}：${collectionDays(language, visit.stop.rawRecyclingDays, visit.stop.recyclingDays)}`,
         ),
       )
       const link = document.createElement('a')
       link.href = `https://www.google.com/maps/search/?api=1&query=${visit.stop.lat},${visit.stop.lng}`
-      link.textContent = '在 Google 地圖開啟'
+      link.textContent = t('在 Google 地圖開啟')
       link.target = '_blank'
       link.rel = 'noopener noreferrer'
       popup.append(document.createElement('br'), link)
@@ -190,7 +194,7 @@ export default function RouteMap({
       marker.setZIndexOffset(visit.state === 'next' ? 800 : 0)
       markers.current.set(visit.id, marker)
     }
-  }, [visits, onSelect, onDismiss])
+  }, [visits, onSelect, onDismiss, language, t])
   useEffect(() => {
     for (const [id, marker] of markers.current)
       marker
@@ -213,31 +217,41 @@ export default function RouteMap({
       )
       selected.openPopup()
     }
-  }, [selectedId, visits, expanded])
+  }, [selectedId, visits, expanded, language])
   return (
     <div className="map-shell">
-      <div ref={container} className="map" aria-label="附近清運站點互動地圖" />
+      <div
+        ref={container}
+        className="map"
+        aria-label={t('附近清運站點互動地圖')}
+      />
       <div className="map-controls">
         {expanded && (
           <button
             className="collapse-route"
-            aria-label="收合完整路線"
+            aria-label={t('收合完整路線')}
             onClick={onCollapse}
           >
-            收合
+            {t('收合')}
           </button>
         )}
-        <button aria-label="放大地圖" onClick={() => map.current?.zoomIn()}>
+        <button
+          aria-label={t('放大地圖')}
+          onClick={() => map.current?.zoomIn()}
+        >
           ＋
         </button>
-        <button aria-label="縮小地圖" onClick={() => map.current?.zoomOut()}>
+        <button
+          aria-label={t('縮小地圖')}
+          onClick={() => map.current?.zoomOut()}
+        >
           −
         </button>
       </div>
       <button
         className="locate-control"
-        aria-label="使用我的位置"
-        title="使用我的位置"
+        aria-label={t('使用我的位置')}
+        title={t('使用我的位置')}
         onClick={onLocate}
         disabled={locating}
       >
@@ -245,7 +259,7 @@ export default function RouteMap({
       </button>
       {tileError && (
         <div className="tile-notice">
-          底圖暫時無法完整載入，仍可點選站點查看班表。
+          {t('底圖暫時無法完整載入，仍可點選站點查看班表。')}
         </div>
       )}
     </div>

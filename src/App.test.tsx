@@ -1,5 +1,5 @@
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { afterEach, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import App, { Timetable } from './App'
 import { dataset } from './test/fixtures'
 import type { Bounds } from './viewport'
@@ -44,7 +44,11 @@ vi.mock('./RouteMap', () => ({
     </div>
   ),
 }))
+beforeEach(() => {
+  localStorage.setItem('tainan-language', 'zh')
+})
 afterEach(() => {
+  localStorage.clear()
   vi.unstubAllGlobals()
   vi.useRealTimers()
 })
@@ -121,4 +125,30 @@ it('recovers from a failed data request', async () => {
   render(<App />)
   fireEvent.click(await screen.findByText('重新載入'))
   await waitFor(() => expect(screen.getByText('使用我的位置')).toBeTruthy())
+})
+
+it('switches languages without resetting the preview and remembers the choice', () => {
+  const view = render(<Timetable data={dataset} />)
+  preview()
+  fireEvent.click(screen.getByRole('button', { name: 'English' }))
+  expect(document.documentElement.lang).toBe('en')
+  expect(
+    screen
+      .getByRole('button', { name: 'English' })
+      .getAttribute('aria-pressed'),
+  ).toBe('true')
+  expect(
+    (screen.getByLabelText('Date (Taiwan time)') as HTMLInputElement).value,
+  ).toBe('2026-11-19')
+  expect((screen.getByLabelText('Time slider') as HTMLInputElement).value).toBe(
+    '1080',
+  )
+  expect(screen.getByText('4 個地圖站點')).toBeTruthy()
+  expect(screen.getByText(/Timetable estimates, not live GPS/)).toBeTruthy()
+  view.unmount()
+  render(<Timetable data={dataset} />)
+  expect(screen.getByRole('button', { name: 'Now' })).toBeTruthy()
+  fireEvent.click(screen.getByRole('button', { name: '中文' }))
+  expect(document.documentElement.lang).toBe('zh-Hant')
+  expect(screen.getByRole('button', { name: '回到現在' })).toBeTruthy()
 })

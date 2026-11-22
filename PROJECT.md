@@ -2,7 +2,7 @@
 
 ## Goal
 
-Help people in Tainan find nearby scheduled garbage collection stops by location and time, without choosing a route. Traditional Chinese, one responsive screen, no account or backend.
+Help people in Tainan find nearby scheduled garbage collection stops by location and time, without choosing a route. Traditional Chinese and English, one responsive screen, no account or backend.
 
 ## Agreed design
 
@@ -15,7 +15,8 @@ Help people in Tainan find nearby scheduled garbage collection stops by location
 - Date picker shows weekday and month/day; normal time slider spans 06:00–22:00. Return-to-now uses actual Taiwan current time, extending the slider range outside those hours. Default/current time advances automatically.
 - My-location button sits inside the map at bottom right. Permission is user initiated; denial/unavailability falls back to map panning. Ignore late location results after the user moves the map. No coordinate persistence; map services receive viewed-area requests.
 - Retain manual zoom buttons and keyboard operation. Preserve zoom when locating; initial framing is the only automatic zoom. Religious base-map POIs remain hidden.
-- Always label **班表估算 · 非即時 GPS**; no truck positions or confirmed arrivals are inferred.
+- Header has a themed 中 | En switch with active and keyboard-focus states; a valid saved choice takes priority; otherwise use Traditional Chinese when the browser's first preferred language is Chinese (zh or zh-*), and English for other languages. The language preference is remembered when browser storage is available. Translate controls, status/errors, collection days and disclosures without resetting the view or time. Official addresses and map labels retain their source language.
+- Keep the timetable-versus-live-GPS disclaimer in the footer in both languages; no truck positions or confirmed arrivals are inferred.
 
 ## Data rules
 
@@ -36,4 +37,4 @@ Vite + React + TypeScript, plain CSS, Leaflet, Vitest, Node 24. Retain the small
 
 ## Current iteration
 
-Publication authorized: simplified time-first stop descriptions with a larger bold time and themed Google Maps button. Main deploys automatically after checks pass.
+Publication authorized: bilingual interface with 中 | En in the header, browser-language defaults and remembered language choice. Main deploys automatically after checks pass.

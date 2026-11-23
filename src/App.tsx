@@ -189,8 +189,6 @@ export function Timetable({ data }: { data: Dataset }) {
         onCollapse={collapse}
         onBounds={changeBounds}
         location={location}
-        onLocate={locate}
-        locating={locating}
       />
       <div className="map-caption" role="status">
         {(notice && t(notice)) ||
@@ -227,16 +225,41 @@ export function Timetable({ data }: { data: Dataset }) {
               }}
             />
           </label>
-          <button
-            className="now-button"
-            onClick={() => {
-              setLive(true)
-              setClock(minuteNow())
-              collapse()
-            }}
-          >
-            {t('回到現在')}
-          </button>
+          <div className="date-actions">
+            <button
+              className="locate-control"
+              aria-label={t('使用我的位置')}
+              title={t('使用我的位置')}
+              onClick={locate}
+              disabled={locating}
+              aria-busy={locating}
+            >
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.7"
+                strokeLinecap="round"
+                aria-hidden="true"
+              >
+                <circle cx="12" cy="12" r="7" />
+                <circle cx="12" cy="12" r="2" />
+                <path d="M12 2v3M12 19v3M2 12h3M19 12h3" />
+              </svg>
+            </button>
+            <button
+              className="now-button"
+              onClick={() => {
+                setLive(true)
+                setClock(minuteNow())
+                collapse()
+              }}
+            >
+              {t('回到現在')}
+            </button>
+          </div>
         </div>
         <div className="timeline">
           <div className="time-indicator" style={{ left: `${position}%` }}>

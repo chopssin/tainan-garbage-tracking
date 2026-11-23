@@ -8,15 +8,12 @@ vi.mock('./RouteMap', () => ({
   default: ({
     visits,
     onBounds,
-    onLocate,
   }: {
     visits: Visit[]
     onBounds: (b: Bounds) => void
-    onLocate: () => void
   }) => (
     <div>
       <span>{visits.length} 個地圖站點</span>
-      <button onClick={onLocate}>使用我的位置</button>
       <button
         onClick={() =>
           onBounds({
@@ -75,7 +72,7 @@ it('requests location only on demand and supports denial', () => {
   vi.stubGlobal('navigator', { geolocation: { getCurrentPosition } })
   render(<Timetable data={dataset} />)
   expect(getCurrentPosition).not.toHaveBeenCalled()
-  fireEvent.click(screen.getByText('使用我的位置'))
+  fireEvent.click(screen.getByRole('button', { name: '使用我的位置' }))
   expect(screen.getByText('未允許定位，請拖曳地圖選擇區域。')).toBeTruthy()
 })
 it('ignores location results after the user moves the map', () => {
@@ -88,7 +85,7 @@ it('ignores location results after the user moves the map', () => {
     },
   })
   render(<Timetable data={dataset} />)
-  fireEvent.click(screen.getByText('使用我的位置'))
+  fireEvent.click(screen.getByRole('button', { name: '使用我的位置' }))
   fireEvent.click(screen.getByText('遠方區域'))
   act(() =>
     success({
@@ -124,7 +121,7 @@ it('recovers from a failed data request', async () => {
   )
   render(<App />)
   fireEvent.click(await screen.findByText('重新載入'))
-  await waitFor(() => expect(screen.getByText('使用我的位置')).toBeTruthy())
+  await waitFor(() => expect(screen.getByRole('button', { name: '使用我的位置' })).toBeTruthy())
 })
 
 it('switches languages without resetting the preview and remembers the choice', () => {

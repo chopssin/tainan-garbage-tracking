@@ -42,8 +42,6 @@ it('preserves the viewport when expanding, selecting, collapsing and updating re
     const matches = viewportStops(dataset, bounds, clock, null)
     const props = {
       location: null,
-      onLocate: vi.fn(),
-      locating: false,
       onBounds: vi.fn(),
       visits: matches,
       selectedId: null as string | null,
@@ -123,7 +121,6 @@ it('keeps dismissed details closed through result updates, then allows reopening
         {...stable}
         expanded
         location={null}
-        locating={false}
         visits={updated ? [...visits] : visits}
         selectedId={selected}
         onSelect={setSelected}

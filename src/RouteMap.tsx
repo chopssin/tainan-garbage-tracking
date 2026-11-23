@@ -15,8 +15,6 @@ interface Props {
   expanded: boolean
   onCollapse: () => void
   location: Location | null
-  onLocate: () => void
-  locating: boolean
   onBounds: (bounds: Bounds) => void
   visits: MapStop[]
   selectedId: string | null
@@ -28,8 +26,6 @@ export default function RouteMap({
   expanded,
   onCollapse,
   location,
-  onLocate,
-  locating,
   onBounds,
   visits,
   selectedId,
@@ -248,15 +244,6 @@ export default function RouteMap({
           −
         </button>
       </div>
-      <button
-        className="locate-control"
-        aria-label={t('使用我的位置')}
-        title={t('使用我的位置')}
-        onClick={onLocate}
-        disabled={locating}
-      >
-        {locating ? '…' : '⌖'}
-      </button>
       {tileError && (
         <div className="tile-notice">
           {t('底圖暫時無法完整載入，仍可點選站點查看班表。')}

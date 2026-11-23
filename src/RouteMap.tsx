@@ -118,9 +118,9 @@ export default function RouteMap({
       const a = L.latLng(from.stop.lat!, from.stop.lng!),
         b = L.latLng(to.stop.lat!, to.stop.lng!)
       L.polyline([a, b], {
-        color: '#718570',
+        color: '#b8d99f',
         weight: 2,
-        opacity: 0.65,
+        opacity: 0.8,
         interactive: false,
       }).addTo(layer)
       if (!a.equals(b)) {

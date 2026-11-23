@@ -1,7 +1,8 @@
 :root {
+  color-scheme: dark;
   font-family: 'Noto Sans TC', sans-serif;
-  color: #293a2c;
-  background: #f5f6f1;
+  color: #edf1f3;
+  background: #151f24;
   font-synthesis: none;
   font-weight: 400;
 }
@@ -32,17 +33,17 @@ button:focus-visible,
 a:focus-visible,
 input:focus-visible,
 summary:focus-visible {
-  outline: 3px solid #385e91;
+  outline: 3px solid #b8d99f;
   outline-offset: 3px;
 }
 a {
-  color: #365b41;
+  color: #b8d99f;
 }
 .sketch-app {
   max-width: 620px;
   margin: 24px auto;
   padding: 28px;
-  background: #cadbb3;
+  background: #151f24;
   min-height: calc(100vh - 48px);
 }
 .sketch-header {
@@ -61,23 +62,23 @@ h1 {
 .sketch-header span {
   font-size: 0.68rem;
   white-space: nowrap;
-  color: #53624a;
+  color: #b5bec3;
 }
 .map-shell {
   position: relative;
   width: 100%;
   aspect-ratio: 1;
   isolation: isolate;
-  border: 1px solid #55634f;
+  border: 1px solid #74817b;
   overflow: hidden;
-  background: #e5e6df;
+  background: #202b30;
 }
 .map {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  background: #e5e6df;
+  background: #202b30;
 }
 .map-controls {
   position: absolute;
@@ -90,13 +91,13 @@ h1 {
 }
 .map-controls button,
 .locate-control {
-  border: 1px solid #87927b;
+  border: 1px solid #8b9c8c;
   border-radius: 4px;
-  background: #f9fbf4ed;
+  background: #1b262bec;
   width: 34px;
   height: 34px;
   font-size: 21px;
-  box-shadow: 0 1px 3px #253b2020;
+  box-shadow: 0 1px 3px #0005;
 }
 .map-controls .collapse-route {
   font-size: 12px;
@@ -113,7 +114,7 @@ h1 {
 .map-caption {
   min-height: 38px;
   font-size: 0.7rem;
-  color: #53604a;
+  color: #b5bec3;
   line-height: 1.6;
   margin-top: 7px;
 }
@@ -129,12 +130,20 @@ h1 {
 }
 .date-picker,
 .now-button {
-  border: 1px solid #5a674e;
-  background: #d8e4c5;
+  border: 1px solid #91a18c;
+  background: #1e292e;
   min-height: 45px;
   padding: 9px 15px;
-  border-radius: 3px;
+  border-radius: 5px;
   font-weight: 500;
+}
+.now-button {
+  background: #b8d99f;
+  color: #18251d;
+  font-weight: 700;
+}
+.now-button:hover {
+  background: #cbe6b5;
 }
 .date-picker {
   position: relative;
@@ -149,19 +158,21 @@ h1 {
   cursor: pointer;
 }
 .date-picker:focus-within {
-  outline: 3px solid #385e91;
+  outline: 3px solid #b8d99f;
   outline-offset: 3px;
 }
 .timeline {
+  border-radius: 5px;
+  background-color: #1e292e;
   position: relative;
-  border: 1px solid #667457;
-  background: linear-gradient(
+  border: 1px solid #546168;
+  background-image: linear-gradient(
     90deg,
     transparent 37.4%,
-    #8e9b7b 37.5%,
+    #3d4b51 37.5%,
     transparent 37.8%,
     transparent 74.9%,
-    #8e9b7b 75%,
+    #3d4b51 75%,
     transparent 75.3%
   );
   height: 46px;
@@ -194,8 +205,8 @@ h1 {
   position: absolute;
   top: -5px;
   bottom: -5px;
-  width: 1px;
-  background: #bd4d3c;
+  width: 2px;
+  background: #b8d99f;
   pointer-events: none;
 }
 .time-indicator output {
@@ -203,9 +214,10 @@ h1 {
   top: 17px;
   left: 0;
   transform: translateX(-50%);
-  background: #bd4d3c;
-  color: #fff;
-  font-size: 0.65rem;
+  background: #b8d99f;
+  color: #18251d;
+  font-weight: 700;
+  font-size: 0.75rem;
   padding: 1px 5px;
   white-space: nowrap;
   border-radius: 2px;
@@ -230,14 +242,14 @@ h1 {
 }
 .time-caption {
   margin: 30px 0 0;
-  color: #637155;
+  color: #9eabb2;
   font-size: 0.7rem;
 }
 .sketch-footer {
   margin-top: 44px;
   font-size: 0.74rem;
   line-height: 1.85;
-  color: #4b5b40;
+  color: #aab6bc;
 }
 .sketch-footer p {
   margin: 0 0 12px;
@@ -264,7 +276,7 @@ h1 {
   display: block;
   width: 17px;
   height: 17px;
-  border: 2px solid #3e4538;
+  border: 2px solid #f2f4f4;
   border-radius: 50%;
   background: #f4b941;
   box-shadow: 0 1px 2px #0002;
@@ -278,12 +290,12 @@ h1 {
 .marker-dot.context {
   width: 14px;
   height: 14px;
-  background: #f0f1e8;
-  border: 2px solid #6c7268;
+  background: transparent;
+  border: 2px solid #eef1f2;
   animation: none;
 }
 .marker-dot.selected {
-  outline: 3px solid #506b42;
+  outline: 3px solid #b8d99f;
   outline-offset: 3px;
 }
 @keyframes markerPulse {
@@ -298,7 +310,7 @@ h1 {
 }
 .route-arrow span {
   display: block;
-  color: #43533b;
+  color: #b8d99f;
   font-size: 15px;
 }
 .leaflet-popup-content {
@@ -311,33 +323,51 @@ h1 {
 .stop-popup-time {
   font-size: 19px;
   line-height: 1.5;
-  color: #29452a;
+  color: #edf1f3;
 }
 .leaflet-popup-content a {
   display: inline-block;
   margin-top: 10px;
   padding: 9px 12px;
-  border: 1px solid #a3b794;
+  border: 1px solid #718174;
   border-radius: 8px;
-  background: #e5eddc;
-  color: #29452a;
+  background: #b8d99f;
+  color: #18251d;
   font-weight: 600;
   text-decoration: none;
 }
 .leaflet-popup-content a:hover {
-  background: #d5e3c8;
-  border-color: #718961;
+  background: #cbe6b5;
+  border-color: #cbe6b5;
 }
 .leaflet-popup-content a:focus-visible {
-  outline: 2px solid #435f34;
+  outline: 2px solid #b8d99f;
   outline-offset: 3px;
 }
 .leaflet-popup-content-wrapper {
-  border-radius: 4px;
+  border-radius: 6px;
+  border: 1px solid #586a61;
+  background: #202c31;
+  color: #edf1f3;
+  box-shadow: 0 5px 18px #0006;
 }
+.leaflet-popup-tip-container {
+  display: none;
+}
+.leaflet-container a.leaflet-popup-close-button {
+  color: #c4cdd1;
+}
+.leaflet-container a.leaflet-popup-close-button:hover {
+  color: #fff;
+}
+.leaflet-control-attribution,
+.leaflet-control-attribution a {
+  color: #bdc8ce;
+}
+
 .leaflet-container .leaflet-control-attribution {
   font-size: 8px;
-  background: #ffffffe0;
+  background: #172126e8;
 }
 .tile-notice {
   position: absolute;
@@ -345,7 +375,7 @@ h1 {
   left: 10px;
   bottom: 30px;
   right: 55px;
-  background: #fff7e7ed;
+  background: #253137f5;
   padding: 7px;
   font-size: 12px;
 }
@@ -409,9 +439,9 @@ h1 {
   flex-shrink: 0;
   gap: 2px;
   padding: 3px;
-  border: 1px solid #a3b794;
+  border: 1px solid #718174;
   border-radius: 10px;
-  background: #e5eddc;
+  background: #1e292e;
 }
 .language-switch button {
   border: 0;
@@ -420,15 +450,15 @@ h1 {
   min-height: 36px;
   background: transparent;
   font-size: 13px;
-  color: #53624a;
+  color: #b5bec3;
 }
 .language-switch button[aria-pressed='true'] {
-  background: #38543a;
-  color: #fff;
+  background: #b8d99f;
+  color: #18251d;
   font-weight: 700;
 }
 .language-switch button:hover:not([aria-pressed='true']) {
-  background: #d5e3c8;
+  background: #34433b;
 }
 .sketch-header h1 {
   letter-spacing: 0.04em;

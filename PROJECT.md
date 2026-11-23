@@ -6,12 +6,12 @@ Help people in Tainan find nearby scheduled garbage collection stops by location
 
 ## Agreed design
 
-- Follow the supplied two-state sketch: pale green single column, 台南倒垃圾！ title, square map, weekday/date picker beside 回到現在, time slider, concise disclaimer and source disclosure.
+- Follow the supplied two-state sketch: dark charcoal single column with off-white text, muted captions and pale-green accents, 台南倒垃圾！ title, square map, weekday/date picker beside 回到現在, time slider, concise disclaimer and source disclosure.
 - Initial map view is approximately 500 m × 500 m. The viewport is the search area; pan/zoom to explore. No radius selector, route selector, sidebar, or stop list.
 - At visible areas ≤2 km² show all geocoded stops as hollow reference markers, including stops without service that day. At larger areas hide these background references.
 - Keep the forward 30-minute timetable window. Each matching route shows one orange current/up-next stop and its immediate source-order next stop in lighter orange, with a directed connection. Missing neighbors are not invented.
 - Tapping any stop reveals that route's full source-order connections; all stops from other routes are hidden until collapse. Closing a stop popup clears only its detail selection, keeps the route revealed, and remains closed after panning, zooming or time refreshes; tapping a stop opens details again. Selecting, expanding, and collapsing do not move or zoom the map.
-- Stop popup shows a larger bold scheduled time, address, then 垃圾／回收 weekdays without a 週 prefix. Place a rounded pale-green Google Maps button below with spacing and visible hover/keyboard-focus states. Omit route information, the date and explanatory text from the popup; retain the page timetable disclaimer. Hollow stops do not imply service that day.
+- Stop popups are dark rectangles with subtly rounded corners and no triangular tip. Each shows a larger bold scheduled time, address, then 垃圾／回收 weekdays without a 週 prefix. Place a rounded pale-green Google Maps button below with spacing and visible hover/keyboard-focus states. Omit route information, the date and explanatory text from the popup; retain the page timetable disclaimer. Hollow stops do not imply service that day.
 - Date picker shows weekday and month/day; normal time slider spans 06:00–22:00. Return-to-now uses actual Taiwan current time, extending the slider range outside those hours. Default/current time advances automatically.
 - My-location button sits inside the map at bottom right. Permission is user initiated; denial/unavailability falls back to map panning. Ignore late location results after the user moves the map. No coordinate persistence; map services receive viewed-area requests.
 - Retain manual zoom buttons and keyboard operation. Preserve zoom when locating; initial framing is the only automatic zoom. Religious base-map POIs remain hidden.
@@ -37,4 +37,4 @@ Vite + React + TypeScript, plain CSS, Leaflet, Vitest, Node 24. Retain the small
 
 ## Current iteration
 
-Publication authorized: bilingual interface with 中 | En in the header, browser-language defaults and remembered language choice. Main deploys automatically after checks pass.
+Publication authorized for the visual refresh: supplied white truck logo for header/favicon; dark UI and vector base map, white hollow reference markers, green parks and yellow main roads; outlined date picker, pale-green Now button and time indicator. Preserve existing interactions, timetable and language behavior. Main deploys automatically after checks pass.

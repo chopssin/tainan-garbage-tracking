@@ -1,3 +1,4 @@
+import seo from './seo-content.json'
 import { useEffect, useState } from 'react'
 
 export type Language = 'zh' | 'en'
@@ -70,7 +71,35 @@ export function useLanguage() {
   })
   useEffect(() => {
     document.documentElement.lang = language === 'zh' ? 'zh-Hant' : 'en'
-    document.title = language === 'zh' ? '台南倒垃圾！' : 'Tainan Trash'
+    document.title = seo[language].title
+    for (const selector of [
+      'meta[name="description"]',
+      'meta[property="og:description"]',
+      'meta[name="twitter:description"]',
+    ]) {
+      document
+        .querySelector(selector)
+        ?.setAttribute('content', seo[language].description)
+    }
+    for (const selector of [
+      'meta[property="og:title"]',
+      'meta[name="twitter:title"]',
+    ]) {
+      document
+        .querySelector(selector)
+        ?.setAttribute('content', seo[language].title)
+    }
+    document
+      .querySelector('meta[property="og:locale"]')
+      ?.setAttribute('content', language === 'zh' ? 'zh_TW' : 'en_US')
+    document
+      .querySelector('meta[property="og:locale:alternate"]')
+      ?.setAttribute('content', language === 'zh' ? 'en_US' : 'zh_TW')
+    for (const section of document.querySelectorAll<HTMLElement>(
+      '[data-seo-language]',
+    )) {
+      section.hidden = section.dataset.seoLanguage !== language
+    }
     try {
       localStorage.setItem('tainan-language', language)
     } catch {

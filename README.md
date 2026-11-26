@@ -1,6 +1,6 @@
 # 倒垃圾了 · Tainan Garbage Tracking
 
-A Traditional Chinese timetable map for Tainan garbage collection. **班表估算 · 非即時 GPS**: it shows published scheduled times, not vehicle locations or arrival confirmation.
+A Traditional Chinese and English timetable map for Tainan garbage collection. **班表估算 · 非即時 GPS**: it shows published scheduled times, not vehicle locations or arrival confirmation.
 
 The square map opens at approximately 500 m × 500 m. Pan or zoom to search the visible area, or tap the location button. Within 2 km², hollow circles show reference stops; orange current/up-next and lighter-orange next stops show the following 30 minutes of published schedules. At wider views, reference circles are hidden. Tap a stop to reveal only its route (other routes’ stops are hidden) and view collection/recycling days or open its location in Google Maps.
 
@@ -76,3 +76,13 @@ GitHub Actions runs checks on pushes and pull requests. Successful pushes to `ma
 3. Run the workflow or push to `main`. GitHub supplies the per-repository base path and a short-lived deployment token; no stored personal token or app API key is needed.
 
 To pause future deployments, remove `PAGES_ENABLED` or set it to `false`. This does not unpublish the existing site. The Actions workflow and base-path support are inherited from the starter.
+
+## Basic SEO and indexing
+
+`src/seo-content.json` is the shared metadata/guide source. Vite generates the initial HTML and `sitemap.xml`; `npm run build` checks the built SEO artifacts. The introduction and collapsed FAQ follow the existing app, remain readable without JavaScript, and match the language switch when JavaScript runs. This is one canonical bilingual URL; no misleading hreflang alternates are emitted. The official query system at https://clean.tnepb.gov.tw/ is only a reference. The branded `public/social-preview.png` is 1200×630; the existing favicon is retained.
+
+After deployment, add a **URL-prefix** property for `https://chopssin.github.io/tainan-garbage-tracking/` in Google Search Console. Supply its verification HTML file or meta tag through a reviewed change, then verify ownership in your Google account. Submit `sitemap.xml`, inspect the canonical URL and request indexing. Search queries and indexing status are measured after Google processes the site; ranking and indexing are not guaranteed.
+
+`robots.txt` applies at the origin root (`https://chopssin.github.io/robots.txt`), outside this repository path. A nested robots file would not control crawling, so none is added here. Recheck any origin-level rules during deployment; submit the sitemap directly in Search Console. No analytics or paid SEO service is required.
+
+Keep the canonical URL in the JSON correct if hosting changes. The same initial Chinese metadata is served to share crawlers; the image is bilingual and browser metadata translates after language selection. The map remains the largest download; this SEO change adds no runtime dependencies. Performance checks should distinguish map/third-party tile costs from the small static guide.

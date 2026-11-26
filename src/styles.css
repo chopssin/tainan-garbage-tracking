@@ -493,3 +493,46 @@ h1 {
     height: 30px;
   }
 }
+
+.site-guide,
+.no-script {
+  max-width: 620px;
+  margin: 0 auto;
+  padding: 0 28px 32px;
+  color: #b5bec3;
+  font-size: 1rem;
+  line-height: 1.75;
+}
+.site-guide article + article {
+  margin-top: 24px;
+}
+.site-guide article[hidden] {
+  display: none;
+}
+.site-guide h2 {
+  color: #edf1f3;
+  font-size: 1.12rem;
+  margin: 0 0 12px;
+}
+.site-guide h3 {
+  color: #edf1f3;
+  font-size: 1rem;
+  margin-bottom: 6px;
+}
+.site-guide p {
+  margin: 0 0 16px;
+}
+.site-guide details {
+  border-top: 1px solid #3d4b51;
+  padding: 16px 0;
+}
+.site-guide summary {
+  cursor: pointer;
+  color: #b8d99f;
+}
+@media (max-width: 620px) {
+  .site-guide,
+  .no-script {
+    padding: 0 20px 24px;
+  }
+}

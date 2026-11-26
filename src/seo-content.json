@@ -1,0 +1,32 @@
+{
+  "url": "https://chopssin.github.io/tainan-garbage-tracking/",
+  "image": "social-preview.png",
+  "zh": {
+    "title": "台南垃圾車時間與清運站點地圖｜台南倒垃圾！",
+    "description": "查詢台南垃圾車時間、附近垃圾清運站點與回收日。使用地圖、定位及日期時間預覽，查看所選時間起 30 分鐘的台南倒垃圾班表。依官方開放資料整理，為班表估算，非即時 GPS。",
+    "heading": "台南垃圾車時間與附近清運站點",
+    "intro": "想查台南垃圾車時間或附近可以倒垃圾的站點？台南倒垃圾！依官方開放資料整理清運班表，讓你透過地圖範圍、日期與時間，查看附近站點的表定收運時間及垃圾、回收日。這是獨立製作的查詢工具，並非政府官方網站。",
+    "faqTitle": "使用說明與常見問題",
+    "faq": [
+      ["如何查詢附近的台南垃圾車班表？", "拖曳或縮放地圖選擇區域，或按定位按鈕移至目前位置。橘色站點代表所選時間起 30 分鐘內的表定班次；點選站點可查看時間、地址及收運日。"],
+      ["這是垃圾車即時位置嗎？", "不是。地圖依官方班表估算，沒有即時 GPS 或實際到站確認。連線表示站序，不是行車道路；假日、停駛及臨時異動請以清潔隊公告為準。"],
+      ["如何查看回收時間與其他日期？", "點選站點查看垃圾與回收日，兩者分開列示。用日期選擇器和時間滑桿預覽其他時段；按「回到現在」恢復台灣目前時間。回收日不一定與垃圾日相同。"],
+      ["資料是否涵蓋台南所有地區？", "目前快照涵蓋 36／37 區，缺少龍崎區；這不代表當地沒有清運服務。空心圓是參考站點，不表示當天有收運。請參閱上方資料來源與涵蓋範圍，確認資料日期與限制。"]
+    ],
+    "referenceLabel": "臺南市垃圾清運查詢系統（官方參考）"
+  },
+  "en": {
+    "title": "Tainan Garbage Collection Schedule & Stop Map | Tainan Trash",
+    "description": "Find Tainan garbage collection times, nearby stops and recycling days. Explore the map or preview a date and time for the next 30 minutes of scheduled service. Based on official open data; timetable estimates, not live GPS.",
+    "heading": "Tainan garbage collection schedule and nearby stops",
+    "intro": "Find Tainan garbage truck schedules and nearby collection stops using the map, date picker and time slider. Tainan Trash presents published collection times and garbage and recycling days from official open data. This is an independently developed tool, not an official government website.",
+    "faqTitle": "How to use the map and frequently asked questions",
+    "faq": [
+      ["How do I find garbage collection near me in Tainan?", "Drag or zoom the map to choose an area, or use the location button. Orange stops indicate scheduled service in the 30 minutes following the selected time. Select a stop to see its time, address and collection days."],
+      ["Does this show live garbage truck locations?", "No. These are timetable estimates without live GPS or confirmed arrivals. Lines show stop order, not driving directions. Check sanitation team notices for holidays, cancellations and temporary changes."],
+      ["How do I check recycling days or another date?", "Select a stop to see garbage and recycling days listed separately. Use the date picker and time slider to preview another time, or Now to return to current Taiwan time. Recycling days may differ from garbage days."],
+      ["Does the data cover all of Tainan?", "The current snapshot covers 36 of 37 districts and omits Longqi (龍崎區); this does not mean it has no collection service. Hollow circles are reference stops and do not imply service that day. See Sources and coverage above for dates and limitations."]
+    ],
+    "referenceLabel": "Official Tainan garbage collection query system (Chinese)"
+  }
+}
